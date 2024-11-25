@@ -91,6 +91,10 @@ dependencies {
 //        }
 //    }
 //}
+repositories{
+    name
+    uri("https://github.com/Zokirjon23/meter-detection")
+}
 
 afterEvaluate {
     android.libraryVariants.onEach { variant ->
