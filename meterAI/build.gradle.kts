@@ -80,3 +80,14 @@ publishing {
         }
     }
 }
+
+//repositories {
+//    maven {
+//        name = "GitLab"
+//        url = uri("https://gitlab.isds.uz/api/v4/projects/machine-learning%2Fdevice%2Fsdk%2Fandroid%2Fmeter-detection/packages/maven")
+//        credentials {
+//            username = project.findProperty("gitlabUsername") ?: System.getenv("CI_JOB_TOKEN")
+//            password = project.findProperty("gitlabToken") ?: System.getenv("CI_JOB_TOKEN")
+//        }
+//    }
+//}
