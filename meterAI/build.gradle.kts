@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "uz.isds.meterai"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -25,11 +25,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     sourceSets {
         getByName("main") {
@@ -68,18 +68,18 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1")
 }
 
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            afterEvaluate {
-                from(components["release"])
-                groupId = "uz.isds"
-                artifactId = "meter"
-                version = "1.0"
-            }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        register<MavenPublication>("release") {
+//            afterEvaluate {
+//                from(components["release"])
+//                groupId = "uz.isds"
+//                artifactId = "meter"
+//                version = "1.0"
+//            }
+//        }
+//    }
+//}
 
 //repositories {
 //    maven {
@@ -91,3 +91,15 @@ publishing {
 //        }
 //    }
 //}
+
+afterEvaluate {
+    android.libraryVariants.onEach { variant ->
+        publishing.publications.create(variant.name,MavenPublication::class.java){
+            from(components.findByName(variant.name))
+
+            groupId = "uz.isds"
+            artifactId = "meter-detection"
+            version = "1.0.0"
+        }
+    }
+}
