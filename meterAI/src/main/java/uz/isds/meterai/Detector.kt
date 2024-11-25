@@ -3,7 +3,6 @@ package uz.isds.meterai
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
-import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
@@ -14,7 +13,6 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
-import java.lang.Exception
 
 class Detector(
     private val context: Context,
@@ -149,10 +147,10 @@ class Detector(
                 val cy = array[c + numElements] // 1
                 val w = array[c + numElements * 2]
                 val h = array[c + numElements * 3]
-                val x1 = cx - (w / 2F)
-                val y1 = cy - (h / 2F)
-                val x2 = cx + (w / 2F)
-                val y2 = cy + (h / 2F)
+                val x1 = (cx - (w / 2F))
+                val y1 = (cy - (h / 2F))
+                val x2 = (cx + (w / 2F))
+                val y2 = (cy + (h / 2F))
                 if (x1 < 0F || x1 > 1F) continue
                 if (y1 < 0F || y1 > 1F) continue
                 if (x2 < 0F || x2 > 1F) continue

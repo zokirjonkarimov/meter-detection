@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
-import android.util.Size
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
@@ -48,7 +47,6 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener {
     private var detector: Detector? = null
 
     private lateinit var cameraExecutor: ExecutorService
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -59,7 +57,6 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener {
         cameraExecutor.execute {
             detector = Detector(baseContext, MODEL_PATH, this)
         }
-
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -103,15 +100,25 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener {
             .build()
 
         preview =  Preview.Builder()
+            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+//            .setTargetAspectRatio(binding.viewFinder.height/binding.viewFinder.width)
             .setTargetRotation(rotation)
             .build()
 
         imageAnalyzer = ImageAnalysis.Builder()
+            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+//            .setTargetAspectRatio(binding.viewFinder.height/binding.viewFinder.width)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-//            .setTargetResolution(Size(1280, 720))
             .setTargetRotation(binding.viewFinder.display.rotation)
             .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
+
+        val screenWidth = binding.viewFinder.width
+        val screenHeight = binding.viewFinder.height
+
+        val scaleX = screenWidth.toFloat() / 1280 // Width of the preview resolution
+        val scaleY = screenHeight.toFloat() / 960 // Height of the preview resolution
+
 
         imageAnalyzer?.setAnalyzer(cameraExecutor) { imageProxy ->
             val bitmapBuffer =
