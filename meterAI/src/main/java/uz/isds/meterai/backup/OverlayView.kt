@@ -1,4 +1,4 @@
-package uz.isds.meterai
+package uz.isds.meterai.backup
 
 import android.content.Context
 import android.graphics.Canvas
@@ -8,6 +8,8 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
+import uz.isds.meterai.R
+import uz.isds.meterai.other.BoundingBox
 
 class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("maven-publish")
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -40,18 +41,30 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 }
 
 dependencies {
+    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.fragment.ktx)
     testImplementation(libs.junit)
+    debugImplementation("androidx.compose.ui:ui-tooling:1.7.5")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0")
+
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
 
     val cameraxVersion = "1.4.0-alpha04"
     implementation("androidx.camera:camera-camera2:${cameraxVersion}")
@@ -91,14 +104,13 @@ dependencies {
 //        }
 //    }
 //}
-repositories{
-    name
-    uri("https://github.com/Zokirjon23/meter-detection")
+repositories {
+    uri("https//:maven.pkg.github.com")
 }
 
 afterEvaluate {
     android.libraryVariants.onEach { variant ->
-        publishing.publications.create(variant.name,MavenPublication::class.java){
+        publishing.publications.create(variant.name, MavenPublication::class.java) {
             from(components.findByName(variant.name))
 
             groupId = "uz.isds"

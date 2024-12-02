@@ -1,4 +1,4 @@
-package uz.isds.meterai
+package uz.isds.meterai.other
 
 data class BoundingBox(
     val x1: Float,

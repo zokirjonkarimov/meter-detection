@@ -1,8 +1,9 @@
-package uz.isds.meterai
+package uz.isds.meterai.other
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
+import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
@@ -147,9 +148,9 @@ class Detector(
                 val cy = array[c + numElements] // 1
                 val w = array[c + numElements * 2]
                 val h = array[c + numElements * 3]
-                val x1 = (cx - (w / 2F))
+                val x1 = (cx - (w / 1.2F))
                 val y1 = (cy - (h / 2F))
-                val x2 = (cx + (w / 2F))
+                val x2 = (cx + (w / 1.2F))
                 val y2 = (cy + (h / 2F))
                 if (x1 < 0F || x1 > 1F) continue
                 if (y1 < 0F || y1 > 1F) continue
@@ -165,7 +166,6 @@ class Detector(
                 )
             }
         }
-
         if (boundingBoxes.isEmpty()) return null
 
         return applyNMS(boundingBoxes)
@@ -215,6 +215,6 @@ class Detector(
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
         private const val CONFIDENCE_THRESHOLD = 0.7F
-        private const val IOU_THRESHOLD = 0.5F
+        private const val IOU_THRESHOLD = 0.7F
     }
 }
