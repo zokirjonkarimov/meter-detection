@@ -11,19 +11,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.isds.meterai.R
 import uz.isds.meterai.ui.component.TextApp
+import uz.isds.meterai.ui.intent.SendImageIntent
+import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.theme.backgroundColor
 import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.theme.textColor
+import uz.isds.meterai.ui.uistate.SendImageUiState
 
 @Composable
-fun SendImageScreen() {
+fun SendImageScreen(presenter: CommonPresenter<SendImageIntent, SendImageUiState>) {
     SendImageContent()
 }
 

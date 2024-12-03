@@ -14,30 +14,35 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import uz.isds.meterai.R
 import uz.isds.meterai.ui.component.TextApp
+import uz.isds.meterai.ui.intent.ImageConfirmIntent
+import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.theme.backgroundColor
 import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.theme.textColor
+import uz.isds.meterai.ui.uistate.ImageConfirmUiState
 
 @Composable
-fun ImageConfirmScreen() {
-    ImageConfirmContent()
+fun ImageConfirmScreen(presenter: CommonPresenter<ImageConfirmIntent, ImageConfirmUiState>) {
+    ImageConfirmContent(presenter.uiState.subscribeAsState().value, presenter::onEventDispatcher)
 }
 
 @Composable
-fun ImageConfirmContent() {
+fun ImageConfirmContent(uiState: ImageConfirmUiState, intent: (ImageConfirmIntent) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -72,41 +77,47 @@ fun ImageConfirmContent() {
                 )
             }
 
-//            Image(bitmap = , modifier = Modifier.fillMaxWidth(), contentDescription = null)
-
+            Image(
+                bitmap = uiState.bitmap!!.asImageBitmap(),
+                modifier = Modifier.fillMaxWidth(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
         }
 
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
+            horizontalArrangement = Arrangement.spacedBy(62.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE4E3E5))
-                    .clickable { }, contentAlignment = Alignment.Center
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 5.dp)
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE4E3E5))
+                        .clickable { intent(ImageConfirmIntent.Back) }, contentAlignment = Alignment.Center
                 ) {
-
                     Icon(
                         painter = painterResource(R.drawable.ic_refresh),
                         contentDescription = null,
                         tint = textColor
                     )
                 }
-
                 TextApp(text = "Переснять")
             }
 
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(primaryColor)
-                    .clickable { }, contentAlignment = Alignment.Center
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 5.dp)
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(primaryColor)
+                        .clickable { intent(ImageConfirmIntent.Done) }, contentAlignment = Alignment.Center
                 ) {
 
                     Icon(
@@ -124,5 +135,5 @@ fun ImageConfirmContent() {
 @Preview
 @Composable
 private fun ImageConfirm() {
-    ImageConfirmScreen()
+//    ImageConfirmScreen(instance.presenter)
 }

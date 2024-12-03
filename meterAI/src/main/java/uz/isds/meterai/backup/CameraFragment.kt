@@ -31,7 +31,7 @@ import uz.isds.meterai.other.Detector
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class CameraFragment : Fragment(R.layout.camera_screen), Detector.DetectorListener {
+class CameraFragment : Fragment(R.layout.camera_screen) {
 
     private val isFrontCamera = false
     private var preview: Preview? = null
@@ -47,9 +47,9 @@ class CameraFragment : Fragment(R.layout.camera_screen), Detector.DetectorListen
         super.onCreate(savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        cameraExecutor.execute {
-            detector = Detector(requireContext(), MODEL_PATH, this)
-        }
+//        cameraExecutor.execute {
+//            detector = Detector(requireContext(), MODEL_PATH, this)
+//        }
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -204,18 +204,18 @@ class CameraFragment : Fragment(R.layout.camera_screen), Detector.DetectorListen
         ).toTypedArray()
     }
 
-    override fun onEmptyDetect() {
-        coroutineScope.launch {
-            binding.overlay.clear()
-        }
-    }
-
-    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
-        coroutineScope.launch {
-            binding.overlay.apply {
-                setResults(boundingBoxes)
-                invalidate()
-            }
-        }
-    }
+//    override fun onEmptyDetect() {
+//        coroutineScope.launch {
+//            binding.overlay.clear()
+//        }
+//    }
+//
+//    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
+//        coroutineScope.launch {
+//            binding.overlay.apply {
+//                setResults(boundingBoxes)
+//                invalidate()
+//            }
+//        }
+//    }
 }

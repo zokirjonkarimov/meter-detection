@@ -1,19 +1,18 @@
 package uz.isds.meterai.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -30,12 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.isds.meterai.R
 import uz.isds.meterai.ui.component.TextApp
+import uz.isds.meterai.ui.intent.ResultIntent
+import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.theme.backgroundColor
 import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.theme.textColor
+import uz.isds.meterai.ui.uistate.ResultUiState
+import kotlin.random.Random
 
 @Composable
-fun ResultScreen() {
+fun ResultScreen(presenter: CommonPresenter<ResultIntent, ResultUiState>) {
     ResultContent()
 }
 
@@ -111,16 +114,25 @@ private fun ResultContent() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 repeat(5) {
+                    val value = Random.nextInt(0, if (it < 3) 2 else 9)
                     Box(
                         modifier = Modifier
                             .padding(end = 2.dp)
                             .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
+                            .border(
+                                1.dp, when {
+                                    value % 2 == 0 -> Color(0xFF3CB95D)
+                                    value % 3 == 0 -> Color(0xFFFFC400)
+                                    value % 5 == 0 -> Color(0xFFED1C24)
+                                    else -> Color(0xFF3CB95D)
+                                }, RoundedCornerShape(7.25.dp)
+                            )
                             .background(
                                 backgroundColor,
                                 RoundedCornerShape(7.25.dp)
                             ), contentAlignment = Alignment.Center
                     ) {
-                        TextApp((it + 1).toString(), fontWeight = FontWeight(700), fontSize = 13.sp)
+                        TextApp(value.toString(), fontWeight = FontWeight(700), fontSize = 13.sp)
                     }
                 }
                 TextApp(
@@ -129,10 +141,19 @@ private fun ResultContent() {
                         .padding(end = 2.dp)
                 )
                 repeat(3) {
+                    val value = Random.nextInt(0, if (it < 3) 2 else 9)
                     Box(
                         modifier = Modifier
                             .padding(end = 2.dp)
                             .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
+                            .border(
+                                1.dp, when {
+                                    value % 2 == 0 -> Color(0xFF3CB95D)
+                                    value % 3 == 0 -> Color(0xFFFFC400)
+                                    value % 5 == 0 -> Color(0xFFED1C24)
+                                    else -> Color(0xFF3CB95D)
+                                }, RoundedCornerShape(7.25.dp)
+                            )
                             .background(
                                 backgroundColor,
                                 RoundedCornerShape(7.25.dp)
@@ -152,21 +173,80 @@ private fun ResultContent() {
                         .align(Alignment.Bottom), fontSize = 13.sp
                 )
             }
+
+            TextApp(
+                fontSize = 12.sp,
+                text = "Точность распозования:",
+                modifier = Modifier.padding(start = 16.dp, bottom = 10.dp, top = 40.dp),
+                color = Color(0xFF7F7A84)
+            )
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(0.33f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .size(6.dp)
+                            .background(Color(0xFF3CB95D), CircleShape)
+                    )
+                    TextApp(
+                        fontSize = 12.sp,
+                        text = "Высокий",
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(0.33f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .size(6.dp)
+                            .background(Color(0xFFFFC400), CircleShape)
+                    )
+                    TextApp(
+                        fontSize = 12.sp,
+                        text = "Средний",
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(0.33f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .size(6.dp)
+                            .background(Color(0xFFED1C24), CircleShape)
+                    )
+                    TextApp(
+                        fontSize = 12.sp,
+                        text = "Низкий",
+                    )
+                }
+            }
         }
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
+            horizontalArrangement = Arrangement.spacedBy(62.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE4E3E5))
-                    .clickable { }, contentAlignment = Alignment.Center
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 5.dp)
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE4E3E5))
+                        .clickable { }, contentAlignment = Alignment.Center
                 ) {
-
                     Icon(
                         painter = painterResource(R.drawable.ic_refresh),
                         contentDescription = null,
@@ -179,11 +259,13 @@ private fun ResultContent() {
 
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(primaryColor)
-                    .clickable { }, contentAlignment = Alignment.Center
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 5.dp)
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(primaryColor)
+                        .clickable { }, contentAlignment = Alignment.Center
                 ) {
 
                     Icon(

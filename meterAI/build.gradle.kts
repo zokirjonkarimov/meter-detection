@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("maven-publish")
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 android {
@@ -79,6 +80,9 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-api:2.16.1")
     implementation("org.tensorflow:tensorflow-lite-gpu:2.16.1")
     implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1")
+
+    implementation(libs.decompose.extensions.compose)
+    implementation(libs.decompose)
 }
 
 //publishing {
