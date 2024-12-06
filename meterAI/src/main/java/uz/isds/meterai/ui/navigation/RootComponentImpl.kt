@@ -54,7 +54,7 @@ class RootComponentImpl(componentContext: ComponentContext) : RootComponent,
             }
             is RootComponent.Config.SendImage -> {
                 val presenter: CommonPresenter<SendImageIntent, SendImageUiState> =
-                    SendImagePresenterImpl(componentContext, navigator)
+                    SendImagePresenterImpl(componentContext, navigator,config.byteArray)
                 RootComponent.Child.SendImage(presenter)
             }
         }

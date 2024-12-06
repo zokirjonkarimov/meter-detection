@@ -1,5 +1,7 @@
 package uz.isds.meterai.ui.uistate
 
-class ResultUiState {
+import uz.isds.meterai.data.response.ImageUploadResponse
 
-}
+data class ResultUiState(
+    val data: ImageUploadResponse
+)

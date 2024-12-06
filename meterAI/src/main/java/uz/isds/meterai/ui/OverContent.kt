@@ -1,5 +1,6 @@
 package uz.isds.meterai.ui
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -33,7 +34,7 @@ import uz.isds.meterai.other.BoundingBox
 import uz.isds.meterai.ui.component.TextApp
 
 @Composable
-fun BoundingBoxView(boundingBox: BoundingBox) {
+fun BoundingBoxView(boundingBox: BoundingBox,bitmap: Bitmap) {
     val borderWidth = 2.dp
     val cornerRadius = 16.dp
     val cnf = boundingBox.cnf
@@ -46,7 +47,6 @@ fun BoundingBoxView(boundingBox: BoundingBox) {
         modifier = Modifier.fillMaxSize()
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            Log.d("TTTT", "canvas: ${size.width} ${size.height}")
             // Bounding box koordinatalari
             val box = Rect(
                 left = boundingBox.x1 * size.width,
@@ -82,42 +82,6 @@ fun BoundingBoxView(boundingBox: BoundingBox) {
                 style = Stroke(width = borderWidth.toPx()),
                 cornerRadius = CornerRadius(cornerRadius.toPx(), cornerRadius.toPx())
             )
-//
-//            val textSize = textMeasurer.measure(text = text)
-//
-//            // Define padding around the text
-//            val padding = 8.dp.toPx()
-//
-//            // Calculate the background rectangle size and position
-//            val rectWidth = (textSize.size.width + 2 * padding + 2.dp.toPx()) * 1.2f
-//            val rectHeight = (textSize.size.height + 2 * padding) / 1.5f
-//            val rectTopLeft = Offset(
-//                (box.bottomCenter.x - rectWidth / 2),
-//                (box.bottomCenter.y - 24)
-//            )
-
-            // Draw the rounded rectangle background
-//            drawRoundRect(
-//                color = Color.Green,
-//                topLeft = rectTopLeft,
-//                size = Size(rectWidth, rectHeight),
-//                cornerRadius = CornerRadius(7.5.dp.toPx(), 7.5.dp.toPx()) // Rounded corners
-//            )
-//            // Draw the text over the background
-//            drawText(
-//                textMeasurer = textMeasurer,
-//                text = text,
-//                topLeft = Offset(
-//                    (box.bottomCenter.x) + 32,
-//                    (box.bottomCenter.y - 8)
-//                ),
-//                style = TextStyle(
-//                    color = Color.White,
-//                    fontSize = 12.sp,
-//                    fontWeight = FontWeight.Bold
-//                )
-//            )
-//            }
         }
         val textSize = textMeasurer.measure(text)
         val offsetY = with(LocalDensity.current) { (offset.y-textSize.size.width/4).toDp() }

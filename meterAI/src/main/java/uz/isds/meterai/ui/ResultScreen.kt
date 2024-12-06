@@ -1,5 +1,8 @@
 package uz.isds.meterai.ui
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,12 +25,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import uz.isds.meterai.MainActivity
 import uz.isds.meterai.R
+import uz.isds.meterai.data.response.ImageUploadResponse
+import uz.isds.meterai.other.Base64Image
 import uz.isds.meterai.ui.component.TextApp
 import uz.isds.meterai.ui.intent.ResultIntent
 import uz.isds.meterai.ui.presenter.CommonPresenter
@@ -39,11 +47,11 @@ import kotlin.random.Random
 
 @Composable
 fun ResultScreen(presenter: CommonPresenter<ResultIntent, ResultUiState>) {
-    ResultContent()
+    ResultContent(presenter.uiState.subscribeAsState().value, presenter::onEventDispatcher)
 }
 
 @Composable
-private fun ResultContent() {
+private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +63,7 @@ private fun ResultContent() {
                 modifier = Modifier.padding(bottom = 20.dp)
             ) {
                 IconButton(
-                    onClick = {},
+                    onClick = { intent(ResultIntent.OpenCamera) },
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
                 ) {
                     Icon(painter = painterResource(R.drawable.ic_back), contentDescription = null)
@@ -89,11 +97,14 @@ private fun ResultContent() {
                 fontSize = 12.sp
             )
             // imagega almashtir
-            Box(
+            Base64Image(
+                base64String = uiState.data.croppedImage ?: "",
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
                     .height(50.dp)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(Color(0xFFF3F3F3))
             )
 
@@ -113,65 +124,70 @@ private fun ResultContent() {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                repeat(5) {
-                    val value = Random.nextInt(0, if (it < 3) 2 else 9)
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 2.dp)
-                            .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
-                            .border(
-                                1.dp, when {
-                                    value % 2 == 0 -> Color(0xFF3CB95D)
-                                    value % 3 == 0 -> Color(0xFFFFC400)
-                                    value % 5 == 0 -> Color(0xFFED1C24)
-                                    else -> Color(0xFF3CB95D)
-                                }, RoundedCornerShape(7.25.dp)
-                            )
-                            .background(
-                                backgroundColor,
-                                RoundedCornerShape(7.25.dp)
-                            ), contentAlignment = Alignment.Center
-                    ) {
-                        TextApp(value.toString(), fontWeight = FontWeight(700), fontSize = 13.sp)
+                if ((uiState.data.data?.result?.size ?: 0) > 4) {
+                    repeat(5) {
+                        val result = uiState.data.data?.result?.get(it)
+                        val percentage = uiState.data.data?.percent?.get(it) ?: 0.0
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 2.dp)
+                                .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
+                                .border(
+                                    1.dp, when {
+                                        percentage > 0.98 -> Color(0xFF3CB95D)
+                                        percentage > 0.96 -> Color(0xFFFFC400)
+                                        percentage > 0.0 -> Color(0xFFED1C24)
+                                        else -> Color.Transparent
+                                    }, RoundedCornerShape(7.25.dp)
+                                )
+                                .background(
+                                    backgroundColor,
+                                    RoundedCornerShape(7.25.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            TextApp(result ?: "", fontWeight = FontWeight(700), fontSize = 13.sp)
+                        }
                     }
                 }
-                TextApp(
-                    ",", modifier = Modifier
-                        .align(Alignment.Bottom)
-                        .padding(end = 2.dp)
-                )
-                repeat(3) {
-                    val value = Random.nextInt(0, if (it < 3) 2 else 9)
-                    Box(
-                        modifier = Modifier
+                if ((uiState.data.data?.result?.size ?: 0) > 5) {
+                    TextApp(
+                        ",", modifier = Modifier
+                            .align(Alignment.Bottom)
                             .padding(end = 2.dp)
-                            .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
-                            .border(
-                                1.dp, when {
-                                    value % 2 == 0 -> Color(0xFF3CB95D)
-                                    value % 3 == 0 -> Color(0xFFFFC400)
-                                    value % 5 == 0 -> Color(0xFFED1C24)
-                                    else -> Color(0xFF3CB95D)
-                                }, RoundedCornerShape(7.25.dp)
+                    )
+                    repeat(3) {
+                        val result = uiState.data.data?.result?.get(it + 5)
+                        val percentage = uiState.data.data?.percent?.get(it + 5) ?: 0.0
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 2.dp)
+                                .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
+                                .border(
+                                    1.dp, when {
+                                        percentage > 0.98 -> Color(0xFF3CB95D)
+                                        percentage > 0.96 -> Color(0xFFFFC400)
+                                        percentage > 0.0 -> Color(0xFFED1C24)
+                                        else -> Color.Transparent
+                                    }, RoundedCornerShape(7.25.dp)
+                                )
+                                .background(
+                                    backgroundColor,
+                                    RoundedCornerShape(7.25.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            TextApp(
+                                result ?: "",
+                                fontWeight = FontWeight(700),
+                                fontSize = 13.sp,
+                                color = primaryColor
                             )
-                            .background(
-                                backgroundColor,
-                                RoundedCornerShape(7.25.dp)
-                            ), contentAlignment = Alignment.Center
-                    ) {
-                        TextApp(
-                            "1",
-                            fontWeight = FontWeight(700),
-                            fontSize = 13.sp,
-                            color = primaryColor
-                        )
+                        }
                     }
+                    TextApp(
+                        text = "м3", modifier = Modifier
+                            .align(Alignment.Bottom), fontSize = 13.sp
+                    )
                 }
-
-                TextApp(
-                    text = "м3", modifier = Modifier
-                        .align(Alignment.Bottom), fontSize = 13.sp
-                )
             }
 
             TextApp(
@@ -245,7 +261,7 @@ private fun ResultContent() {
                         .size(60.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFE4E3E5))
-                        .clickable { }, contentAlignment = Alignment.Center
+                        .clickable { intent(ResultIntent.OpenCamera) }, contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_refresh),
@@ -259,15 +275,27 @@ private fun ResultContent() {
 
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val context = LocalContext.current
                 Box(
                     modifier = Modifier
                         .padding(bottom = 5.dp)
                         .size(60.dp)
                         .clip(CircleShape)
                         .background(primaryColor)
-                        .clickable { }, contentAlignment = Alignment.Center
+                        .clickable {
+                            val returnIntent = Intent().apply {
+                                val stringBuild = StringBuilder()
+                                uiState.data.data?.result?.filterNotNull()?.forEach {
+                                    stringBuild.append(it)
+                                }
+                                putExtra("result", stringBuild.toString())
+                            }
+                            (context as MainActivity).apply {
+                                setResult(Activity.RESULT_OK, returnIntent)
+                                finish()
+                            }
+                        }, contentAlignment = Alignment.Center
                 ) {
-
                     Icon(
                         painter = painterResource(R.drawable.ic_checked),
                         contentDescription = null,
@@ -278,10 +306,14 @@ private fun ResultContent() {
             }
         }
     }
+
+    BackHandler {
+        intent(ResultIntent.OpenCamera)
+    }
 }
 
 @Preview
 @Composable
 private fun ResultPreview() {
-    ResultContent()
+    ResultContent(ResultUiState(ImageUploadResponse())) {}
 }

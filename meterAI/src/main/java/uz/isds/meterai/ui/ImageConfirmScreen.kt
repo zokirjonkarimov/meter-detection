@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -54,7 +56,7 @@ fun ImageConfirmContent(uiState: ImageConfirmUiState, intent: (ImageConfirmInten
                 modifier = Modifier.padding(bottom = 20.dp)
             ) {
                 IconButton(
-                    onClick = {},
+                    onClick = { intent(ImageConfirmIntent.Back) },
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
                 ) {
                     Icon(painter = painterResource(R.drawable.ic_back), contentDescription = null)
@@ -76,13 +78,16 @@ fun ImageConfirmContent(uiState: ImageConfirmUiState, intent: (ImageConfirmInten
                     lineHeight = 19.5.sp
                 )
             }
-
-            Image(
-                bitmap = uiState.bitmap!!.asImageBitmap(),
-                modifier = Modifier.fillMaxWidth(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
+            uiState.bitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    modifier = Modifier.fillMaxWidth().aspectRatio(1f).padding(horizontal = 16.dp).clip(
+                        RoundedCornerShape(16.dp)
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
 
         Row(
@@ -119,7 +124,6 @@ fun ImageConfirmContent(uiState: ImageConfirmUiState, intent: (ImageConfirmInten
                         .background(primaryColor)
                         .clickable { intent(ImageConfirmIntent.Done) }, contentAlignment = Alignment.Center
                 ) {
-
                     Icon(
                         painter = painterResource(R.drawable.ic_checked),
                         contentDescription = null,

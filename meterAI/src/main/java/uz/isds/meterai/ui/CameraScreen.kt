@@ -10,7 +10,10 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import android.os.Build
 import android.util.Log
+import android.view.Surface
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -78,7 +81,7 @@ fun CameraScreen(presenter: CommonPresenter<CameraIntent, CameraUiState>) {
 @Composable
 private fun CameraContent(intent: (CameraIntent) -> Unit) {
     val boundingBox = remember { mutableStateOf<BoundingBox?>(null) }
-    var screenBitmap = remember { mutableStateOf<Bitmap?>(null) }
+    val screenBitmap = remember { mutableStateOf<Bitmap?>(null) }
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -92,8 +95,6 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
                 coroutineScope.launch {
                     screenBitmap.value = bitmap
                     boundingBox.value = boundingBoxes.maxBy { it.cnf }
-                    Log.d("DDDD", "onDetect: ${boundingBox.value!!.h} vs ${boundingBox.value!!.w}")
-//                    onBoundingBoxesDetected(boundingBoxes.maxBy { it.cnf }, inferenceTime)
                 }
             }
 
@@ -101,7 +102,6 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
                 coroutineScope.launch {
                     boundingBox.value = null
                     screenBitmap.value = null
-//                    onEmptyDetection()
                 }
             }
         }
@@ -127,7 +127,12 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
             factory = { ctx ->
                 val preview = PreviewView(ctx).apply {
                     scaleType = PreviewView.ScaleType.FILL_CENTER
-//                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                }
+                val rotation: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    context.display.rotation
+                } else {
+                    val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                    wm.defaultDisplay.rotation
                 }
                 val cameraProvider = cameraProviderFuture.get()
 //            val rotation = preview.display.rotation
@@ -138,14 +143,14 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
 
                 val previewUseCase = Preview.Builder()
                     .setTargetAspectRatio(AspectRatio.RATIO_16_9)
-//                .setTargetRotation(rotation)
+                    .setTargetRotation(rotation)
                     .build()
 
                 val imageAnalysisUseCase = ImageAnalysis.Builder()
                     .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
-//                .setTargetRotation(rotation)
+                    .setTargetRotation(rotation)
                     .build().apply {
                         setAnalyzer(cameraExecutor) { imageProxy ->
                             val bitmapBuffer = Bitmap.createBitmap(
@@ -305,8 +310,8 @@ fun cropBitmap(bitmap: Bitmap, boundingBox: BoundingBox, cornerRadiusPx: Float):
     // Asl bitmapdan faqat box ichidagi qismini kesib olish
     canvas.drawBitmap(
         bitmap,
-        android.graphics.Rect(box.left, box.top, box.right, box.bottom), // Asl bitmapdan qism
-        android.graphics.Rect(0, 0, box.width(), box.height()), // Yangi bitmap koordinatalari
+        android.graphics.Rect(box.left, box.top, box.right, box.bottom),
+        android.graphics.Rect(0, 0, box.width(), box.height()),
         paint
     )
 

@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import uz.isds.meterai.R
 import uz.isds.meterai.ui.component.TextApp
 import uz.isds.meterai.ui.intent.SendImageIntent
@@ -26,13 +27,13 @@ import uz.isds.meterai.ui.uistate.SendImageUiState
 
 @Composable
 fun SendImageScreen(presenter: CommonPresenter<SendImageIntent, SendImageUiState>) {
-    SendImageContent()
+    SendImageContent(presenter.uiState.subscribeAsState().value,presenter::onEventDispatcher)
 }
 
 @Composable
-private fun SendImageContent() {
+private fun SendImageContent(uiState: SendImageUiState, intent: (SendImageIntent) -> Unit) {
     Box(modifier = Modifier.fillMaxSize().background(backgroundColor)) {
-        IconButton(onClick = {}, modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
+        IconButton(onClick = { intent(SendImageIntent.Back) }, modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
             Icon(
                 painter = painterResource(R.drawable.ic_back),
                 tint = textColor,
@@ -57,5 +58,5 @@ private fun SendImageContent() {
 @Preview
 @Composable
 private fun SendImagePreview() {
-    SendImageContent()
+    SendImageContent(SendImageUiState()){}
 }

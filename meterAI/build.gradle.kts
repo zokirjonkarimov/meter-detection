@@ -50,13 +50,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.legacy.support.v4)
-    implementation(libs.androidx.fragment.ktx)
     testImplementation(libs.junit)
     debugImplementation("androidx.compose.ui:ui-tooling:1.7.5")
     androidTestImplementation(libs.androidx.junit)
@@ -83,6 +79,16 @@ dependencies {
 
     implementation(libs.decompose.extensions.compose)
     implementation(libs.decompose)
+
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.accompanist.systemuicontroller)
+
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.client.logging.jvm)
+    implementation(libs.ktor.client.content.negotiation)
 }
 
 //publishing {

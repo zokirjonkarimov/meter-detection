@@ -5,6 +5,7 @@ import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.value.Value
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import uz.isds.meterai.data.response.ImageUploadResponse
 import uz.isds.meterai.ui.intent.CameraIntent
 import uz.isds.meterai.ui.intent.ImageConfirmIntent
 import uz.isds.meterai.ui.intent.ResultIntent
@@ -38,7 +39,7 @@ interface RootComponent {
         class SendImage(@Transient val byteArray: ByteArray? = null) : Config
 
         @Serializable
-        class Result(val data: String) : Config
+        class Result(val data: ImageUploadResponse) : Config
     }
 
     val stack: Value<ChildStack<*, Child>>
