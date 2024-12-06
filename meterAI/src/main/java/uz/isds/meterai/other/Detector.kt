@@ -148,15 +148,14 @@ class Detector(
                 val cy = array[c + numElements] // 1
                 val w = array[c + numElements * 2]
                 val h = array[c + numElements * 3]
-                val x1 = (cx - (w / 1.2F))
+                val x1 = (cx - (w / 2F))
                 val y1 = (cy - (h / 2F))
-                val x2 = (cx + (w / 1.2F))
+                val x2 = (cx + (w / 2F))
                 val y2 = (cy + (h / 2F))
                 if (x1 < 0F || x1 > 1F) continue
                 if (y1 < 0F || y1 > 1F) continue
                 if (x2 < 0F || x2 > 1F) continue
                 if (y2 < 0F || y2 > 1F) continue
-
                 boundingBoxes.add(
                     BoundingBox(
                         x1 = x1, y1 = y1, x2 = x2, y2 = y2,

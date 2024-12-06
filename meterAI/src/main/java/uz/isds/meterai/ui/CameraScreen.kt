@@ -1,6 +1,7 @@
 package uz.isds.meterai.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -63,6 +64,7 @@ import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.uistate.CameraUiState
 import java.util.concurrent.Executors
+import kotlin.math.abs
 
 
 @Composable
@@ -90,6 +92,7 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
                 coroutineScope.launch {
                     screenBitmap.value = bitmap
                     boundingBox.value = boundingBoxes.maxBy { it.cnf }
+                    Log.d("DDDD", "onDetect: ${boundingBox.value!!.h} vs ${boundingBox.value!!.w}")
 //                    onBoundingBoxesDetected(boundingBoxes.maxBy { it.cnf }, inferenceTime)
                 }
             }
@@ -123,7 +126,8 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
         AndroidView(
             factory = { ctx ->
                 val preview = PreviewView(ctx).apply {
-//                    scaleType = PreviewView.ScaleType.FIT_START
+                    scaleType = PreviewView.ScaleType.FILL_CENTER
+//                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
                 }
                 val cameraProvider = cameraProviderFuture.get()
 //            val rotation = preview.display.rotation
@@ -133,12 +137,12 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
                     .build()
 
                 val previewUseCase = Preview.Builder()
-                    .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                    .setTargetAspectRatio(AspectRatio.RATIO_16_9)
 //                .setTargetRotation(rotation)
                     .build()
 
                 val imageAnalysisUseCase = ImageAnalysis.Builder()
-                    .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                    .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
 //                .setTargetRotation(rotation)

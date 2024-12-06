@@ -27,17 +27,17 @@ class MainActivity : ComponentActivity() {
                     Button(onClick = { startSdk = true }) { Text(text = "Strat SDK") }
                 }
 
-                LaunchedEffect(startSdk) {
-                    if (startSdk) {
-                        startActivity(
-                            Intent(
-                                this@MainActivity,
-                                uz.isds.meterai.MainActivity::class.java
-                            )
-                        )
-                        startSdk = false
-                    }
-                }
+//                LaunchedEffect(startSdk) {
+//                    if (startSdk) {
+//                        startActivity(
+//                            Intent(
+//                                this@MainActivity,
+//                                uz.isds.meterai.MainActivity::class.java
+//                            )
+//                        )
+//                        startSdk = false
+//                    }
+//                }
             }
         }
     }
