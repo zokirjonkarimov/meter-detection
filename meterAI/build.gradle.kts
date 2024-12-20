@@ -47,7 +47,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.ui.tooling.preview)
+    compileOnly(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity)

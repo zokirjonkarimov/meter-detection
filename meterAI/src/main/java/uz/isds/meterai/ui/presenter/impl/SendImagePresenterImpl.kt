@@ -14,8 +14,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import uz.isds.meterai.data.ResultData
-import uz.isds.meterai.domain.Repository
-import uz.isds.meterai.domain.impl.RepositoryImpl
+import uz.isds.meterai.domain.AiRepository
+import uz.isds.meterai.domain.impl.AiRepositoryImpl
 import uz.isds.meterai.ui.intent.SendImageIntent
 import uz.isds.meterai.ui.navigation.RootComponent
 import uz.isds.meterai.ui.presenter.CommonPresenter
@@ -29,7 +29,7 @@ class SendImagePresenterImpl(
 ) : CommonPresenter<SendImageIntent, SendImageUiState>, ComponentContext by componentContext{
     override val uiState = MutableValue(SendImageUiState())
     private val coroutineScope = CoroutineScope(Dispatchers.Main+ SupervisorJob())
-    private val repository : Repository = RepositoryImpl()
+    private val aiRepository : AiRepository = AiRepositoryImpl()
     init {
         doOnDestroy { coroutineScope.cancel() }
 //        coroutineScope.launch {
@@ -37,7 +37,7 @@ class SendImagePresenterImpl(
 //            navigator.push(RootComponent.Config.Result(""))
 //        }
         if (byteArray != null){
-            repository.sendImage(byteArray).onEach { result ->
+            aiRepository.sendImage(byteArray).onEach { result ->
                 when(result){
                     is ResultData.Error -> {}
                     is ResultData.Message -> {}

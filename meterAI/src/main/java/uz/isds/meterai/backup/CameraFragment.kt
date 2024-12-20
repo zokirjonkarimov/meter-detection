@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,37 +18,41 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import androidx.fragment.app.Fragment
+import uz.isds.meterai.backup.Constants.MODEL_PATH
 import uz.isds.meterai.R
-import uz.isds.meterai.databinding.CameraScreenBinding
-import uz.isds.meterai.other.BoundingBox
-import uz.isds.meterai.other.Constants.MODEL_PATH
-import uz.isds.meterai.other.Detector
+import uz.isds.meterai.databinding.ActivityMainBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class CameraFragment : Fragment(R.layout.camera_screen) {
-
+class CameraFragment : Fragment(), Detector.DetectorListener {
+    private lateinit var binding: ActivityMainBinding
     private val isFrontCamera = false
+
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var detector: Detector? = null
-    private lateinit var cameraExecutor: ExecutorService
-    private lateinit var binding: CameraScreenBinding
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private lateinit var cameraExecutor: ExecutorService
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-//        cameraExecutor.execute {
-//            detector = Detector(requireContext(), MODEL_PATH, this)
-//        }
+        cameraExecutor.execute {
+            detector = Detector(requireContext(), MODEL_PATH, this)
+        }
+
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -59,40 +62,31 @@ class CameraFragment : Fragment(R.layout.camera_screen) {
         bindListeners()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = CameraScreenBinding.inflate(inflater)
-        return binding.root
-    }
-
     private fun bindListeners() {
         binding.apply {
-//            isGpu.setOnCheckedChangeListener { buttonView, isChecked ->
-//                cameraExecutor.submit {
-//                    detector?.restart(isGpu = isChecked)
-//                }
-//                if (isChecked) {
-//                    buttonView.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.orange))
-//                } else {
-//                    buttonView.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.gray))
-//                }
-//            }
+            isGpu.setOnCheckedChangeListener { buttonView, isChecked ->
+                cameraExecutor.submit {
+                    detector?.restart(isGpu = isChecked)
+                }
+                if (isChecked) {
+                    buttonView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.orange))
+                } else {
+                    buttonView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray))
+                }
+            }
         }
     }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
-            cameraProvider = cameraProviderFuture.get()
+            cameraProvider  = cameraProviderFuture.get()
             bindCameraUseCases()
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     private fun bindCameraUseCases() {
-        val cameraProvider =
-            cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
+        val cameraProvider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
 
         val rotation = binding.viewFinder.display.rotation
 
@@ -101,26 +95,17 @@ class CameraFragment : Fragment(R.layout.camera_screen) {
             .requireLensFacing(CameraSelector.LENS_FACING_BACK)
             .build()
 
-        preview = Preview.Builder()
+        preview =  Preview.Builder()
             .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-//            .setTargetAspectRatio(binding.viewFinder.height/binding.viewFinder.width)
             .setTargetRotation(rotation)
             .build()
 
         imageAnalyzer = ImageAnalysis.Builder()
             .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-//            .setTargetAspectRatio(binding.viewFinder.height/binding.viewFinder.width)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .setTargetRotation(binding.viewFinder.display.rotation)
             .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
-
-//        val screenWidth = binding.viewFinder.width
-//        val screenHeight = binding.viewFinder.height
-//
-//        val scaleX = screenWidth.toFloat() / 1280 // Width of the preview resolution
-//        val scaleY = screenHeight.toFloat() / 960 // Height of the preview resolution
-
 
         imageAnalyzer?.setAnalyzer(cameraExecutor) { imageProxy ->
             val bitmapBuffer =
@@ -164,7 +149,7 @@ class CameraFragment : Fragment(R.layout.camera_screen) {
             )
 
             preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-        } catch (exc: Exception) {
+        } catch(exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
     }
@@ -174,22 +159,19 @@ class CameraFragment : Fragment(R.layout.camera_screen) {
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        if (it[Manifest.permission.CAMERA] == true) {
-            startCamera()
-        }
+        ActivityResultContracts.RequestMultiplePermissions()) {
+        if (it[Manifest.permission.CAMERA] == true) { startCamera() }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        detector = null
+        detector?.close()
         cameraExecutor.shutdown()
     }
 
     override fun onResume() {
         super.onResume()
-        if (allPermissionsGranted()) {
+        if (allPermissionsGranted()){
             startCamera()
         } else {
             requestPermissionLauncher.launch(REQUIRED_PERMISSIONS)
@@ -199,23 +181,24 @@ class CameraFragment : Fragment(R.layout.camera_screen) {
     companion object {
         private const val TAG = "Camera"
         private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = mutableListOf(
+        private val REQUIRED_PERMISSIONS = mutableListOf (
             Manifest.permission.CAMERA
         ).toTypedArray()
     }
 
-//    override fun onEmptyDetect() {
-//        coroutineScope.launch {
-//            binding.overlay.clear()
-//        }
-//    }
-//
-//    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
-//        coroutineScope.launch {
-//            binding.overlay.apply {
-//                setResults(boundingBoxes)
-//                invalidate()
-//            }
-//        }
-//    }
+    override fun onEmptyDetect() {
+        requireActivity().runOnUiThread {
+            binding.overlay.clear()
+        }
+    }
+
+    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
+        requireActivity().runOnUiThread {
+            binding.inferenceTime.text = "${inferenceTime}ms"
+            binding.overlay.apply {
+                setResults(boundingBoxes)
+                invalidate()
+            }
+        }
+    }
 }

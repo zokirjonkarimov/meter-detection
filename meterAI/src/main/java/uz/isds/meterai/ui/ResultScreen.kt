@@ -149,7 +149,7 @@ private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit
                         }
                     }
                 }
-                if ((uiState.data.data?.result?.size ?: 0) > 5) {
+                if ((uiState.data.data?.result?.size ?: 0) >= 8) {
                     TextApp(
                         ",", modifier = Modifier
                             .align(Alignment.Bottom)

@@ -9,16 +9,16 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
 import uz.isds.meterai.R
-import uz.isds.meterai.other.BoundingBox
 
 class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     private var results = listOf<BoundingBox>()
-    private var boxPaint = Paint()
-    private var textBackgroundPaint = Paint()
-    private var textPaint = Paint()
+    private val boxPaint = Paint()
+    private val textPaint = Paint()
+    private val confidencePaint = Paint()
+    private val cornerPaint = Paint()
 
-    private var bounds = Rect()
+    private val bounds = Rect()
 
     init {
         initPaints()
@@ -26,25 +26,25 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     fun clear() {
         results = listOf()
-        textPaint.reset()
-        textBackgroundPaint.reset()
-        boxPaint.reset()
         invalidate()
-        initPaints()
     }
 
     private fun initPaints() {
-        textBackgroundPaint.color = Color.BLACK
-        textBackgroundPaint.style = Paint.Style.FILL
-        textBackgroundPaint.textSize = 50f
-
-        textPaint.color = Color.WHITE
-        textPaint.style = Paint.Style.FILL
-        textPaint.textSize = 50f
-
-        boxPaint.color = ContextCompat.getColor(context!!, R.color.bounding_box_color)
-        boxPaint.strokeWidth = 8F
+        boxPaint.color = Color.GREEN
+        boxPaint.strokeWidth = 6F
         boxPaint.style = Paint.Style.STROKE
+
+        // Burchaklar uchun
+        cornerPaint.color = Color.GREEN
+        cornerPaint.strokeWidth = 10F
+        cornerPaint.style = Paint.Style.STROKE
+
+        confidencePaint.color = Color.parseColor("#3CB95D") // Fon rangi
+        confidencePaint.style = Paint.Style.FILL
+
+        textPaint.color = Color.WHITE // Matn rangi
+        textPaint.textSize = 40f // Matn o‘lchami (12sp = taxminan 40f)
+        textPaint.textAlign = Paint.Align.CENTER // Matnni o‘rtada joylash
     }
 
     override fun draw(canvas: Canvas) {
@@ -56,22 +56,49 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
             val right = it.x2 * width
             val bottom = it.y2 * height
 
-            canvas.drawRect(left, top, right, bottom, boxPaint)
-            val drawableText = it.clsName
+            // To'rtburchak burchaklar bilan chizish
+            drawRoundedCorners(canvas, left, top, right, bottom)
 
-            textBackgroundPaint.getTextBounds(drawableText, 0, drawableText.length, bounds)
+            // Aniqlik matnini yozish (Kotlin)
+            val confidenceText = "${(it.cnf * 100).toInt()}%"
+            textPaint.getTextBounds(confidenceText, 0, confidenceText.length, bounds)
+
+            // Aniqlik matni uchun joyni hisoblash
             val textWidth = bounds.width()
             val textHeight = bounds.height()
-            canvas.drawRect(
-                left,
-                top,
-                left + textWidth + BOUNDING_RECT_TEXT_PADDING,
-                top + textHeight + BOUNDING_RECT_TEXT_PADDING,
-                textBackgroundPaint
-            )
-            canvas.drawText(drawableText, left, top + bounds.height(), textPaint)
 
+            // Aniqlik matni uchun fonni chizish
+            val rectLeft = (left + right) / 2 - textWidth / 2f - 10
+            val rectRight = (left + right) / 2 + textWidth / 2f + 10
+            val rectBottom = bottom + textHeight + 20
+            val rectTop = bottom + 10
+            canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, confidencePaint)
+
+            // Aniqlik matnini chizish
+            val textX = (left + right) / 2f
+            val textY = bottom + textHeight + 10
+            canvas.drawText(confidenceText, textX, textY, textPaint)
         }
+    }
+
+    private fun drawRoundedCorners(canvas: Canvas, left: Float, top: Float, right: Float, bottom: Float) {
+        val cornerLength = 50f
+
+        // Yuqori chap
+        canvas.drawLine(left, top, left + cornerLength, top, cornerPaint)
+        canvas.drawLine(left, top, left, top + cornerLength, cornerPaint)
+
+        // Yuqori o'ng
+        canvas.drawLine(right, top, right - cornerLength, top, cornerPaint)
+        canvas.drawLine(right, top, right, top + cornerLength, cornerPaint)
+
+        // Pastki chap
+        canvas.drawLine(left, bottom, left + cornerLength, bottom, cornerPaint)
+        canvas.drawLine(left, bottom, left, bottom - cornerLength, cornerPaint)
+
+        // Pastki o'ng
+        canvas.drawLine(right, bottom, right - cornerLength, bottom, cornerPaint)
+        canvas.drawLine(right, bottom, right, bottom - cornerLength, cornerPaint)
     }
 
     fun setResults(boundingBoxes: List<BoundingBox>) {
@@ -83,3 +110,4 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         private const val BOUNDING_RECT_TEXT_PADDING = 8
     }
 }
+
