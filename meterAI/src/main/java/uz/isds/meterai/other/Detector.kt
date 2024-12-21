@@ -41,7 +41,7 @@ class Detector(
                 val delegateOptions = compatList.bestOptionsForThisDevice
                 this.addDelegate(GpuDelegate(delegateOptions))
             } else {
-                this.setNumThreads(4)
+                this.setNumThreads(1)
             }
         }
 
@@ -78,7 +78,7 @@ class Detector(
                     val delegateOptions = compatList.bestOptionsForThisDevice
                     this.addDelegate(GpuDelegate(delegateOptions))
                 } else {
-                    this.setNumThreads(4)
+                    this.setNumThreads(1)
                 }
             }
         } else {

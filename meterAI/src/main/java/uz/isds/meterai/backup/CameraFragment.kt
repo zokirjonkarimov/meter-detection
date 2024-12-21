@@ -3,7 +3,11 @@ package uz.isds.meterai.backup
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,12 +25,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import uz.isds.meterai.backup.Constants.MODEL_PATH
 import uz.isds.meterai.R
-import uz.isds.meterai.databinding.ActivityMainBinding
+import uz.isds.meterai.databinding.CameraLayoutBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class CameraFragment : Fragment(), Detector.DetectorListener {
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: CameraLayoutBinding
     private val isFrontCamera = false
 
     private var preview: Preview? = null
@@ -34,7 +38,7 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var detector: Detector? = null
-
+    private var isDetect = false
     private lateinit var cameraExecutor: ExecutorService
 
     override fun onCreateView(
@@ -42,7 +46,7 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = CameraLayoutBinding.inflate(layoutInflater)
         return binding.root
     }
 
@@ -64,15 +68,10 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
 
     private fun bindListeners() {
         binding.apply {
-            isGpu.setOnCheckedChangeListener { buttonView, isChecked ->
-                cameraExecutor.submit {
-                    detector?.restart(isGpu = isChecked)
-                }
-                if (isChecked) {
-                    buttonView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.orange))
-                } else {
-                    buttonView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray))
-                }
+            val shapeDrawable = ShapeDrawable(OvalShape())
+            shapeDrawable.paint.color = Color.parseColor("")
+            take.setOnClickListener {
+
             }
         }
     }
@@ -88,7 +87,7 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
     private fun bindCameraUseCases() {
         val cameraProvider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
 
-        val rotation = binding.viewFinder.display.rotation
+//        val rotation = binding.viewFinder.display.rotation
 
         val cameraSelector = CameraSelector
             .Builder()
@@ -97,13 +96,13 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
 
         preview =  Preview.Builder()
             .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-            .setTargetRotation(rotation)
+//            .setTargetRotation(rotation)
             .build()
 
         imageAnalyzer = ImageAnalysis.Builder()
             .setTargetAspectRatio(AspectRatio.RATIO_4_3)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .setTargetRotation(binding.viewFinder.display.rotation)
+//            .setTargetRotation(binding.viewFinder.display.rotation)
             .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
 
@@ -189,9 +188,13 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
     override fun onEmptyDetect() {
         requireActivity().runOnUiThread {
             binding.overlay.clear()
+            val gradientDrawable = GradientDrawable()
+            gradientDrawable.shape = GradientDrawable.OVAL
+            gradientDrawable.setColor(Color.parseColor("#80ED1C24"))
+            binding.take.background = gradientDrawable
+
         }
     }
-
     override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
         requireActivity().runOnUiThread {
             binding.inferenceTime.text = "${inferenceTime}ms"
@@ -199,6 +202,10 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
                 setResults(boundingBoxes)
                 invalidate()
             }
+            val gradientDrawable = GradientDrawable()
+            gradientDrawable.shape = GradientDrawable.OVAL
+            gradientDrawable.setColor(Color.parseColor("#ED1C24"))
+            binding.take.background = gradientDrawable
         }
     }
 }

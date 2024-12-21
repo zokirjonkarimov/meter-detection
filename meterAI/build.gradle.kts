@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("maven-publish")
     alias(libs.plugins.kotlin.compose)
+    id("maven-publish")
     alias(libs.plugins.kotlinSerialization)
 }
 
@@ -25,6 +25,7 @@ android {
                 "proguard-rules.pro"
             )
         }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -50,14 +51,8 @@ dependencies {
     compileOnly(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity)
+//    implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.legacy.support.v4)
-    testImplementation(libs.junit)
-    debugImplementation("androidx.compose.ui:ui-tooling:1.7.5")
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0")
 
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -68,21 +63,16 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:${cameraxVersion}")
     implementation("androidx.camera:camera-view:${cameraxVersion}")
 
-    implementation("org.tensorflow:tensorflow-lite:2.16.1")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
-
-    implementation("org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4")
     implementation("org.tensorflow:tensorflow-lite-gpu-api:2.16.1")
-    implementation("org.tensorflow:tensorflow-lite-api:2.16.1")
     implementation("org.tensorflow:tensorflow-lite-gpu:2.16.1")
-    implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1")
 
     implementation(libs.decompose.extensions.compose)
     implementation(libs.decompose)
 
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
-    implementation(libs.accompanist.systemuicontroller)
+//    implementation(libs.koin.android)
+//    implementation(libs.koin.androidx.compose)
+//    implementation(libs.accompanist.systemuicontroller)
 
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.serialization)
@@ -122,7 +112,6 @@ afterEvaluate {
     android.libraryVariants.onEach { variant ->
         publishing.publications.create(variant.name, MavenPublication::class.java) {
             from(components.findByName(variant.name))
-
             groupId = "uz.isds"
             artifactId = "meter-detection"
             version = "1.0.0"

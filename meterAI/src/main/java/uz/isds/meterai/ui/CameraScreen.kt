@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.Surface
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -56,20 +57,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
-import androidx.fragment.app.commit
-import androidx.lifecycle.ReportFragment.Companion.reportFragment
-import kotlinx.coroutines.launch
-import uz.isds.meterai.MainActivity
 import uz.isds.meterai.R
 import uz.isds.meterai.backup.CameraFragment
-import uz.isds.meterai.other.BoundingBox
-import uz.isds.meterai.other.Constants.MODEL_PATH
-import uz.isds.meterai.other.Detector
 import uz.isds.meterai.ui.intent.CameraIntent
 import uz.isds.meterai.ui.presenter.CommonPresenter
-import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.uistate.CameraUiState
-import java.util.concurrent.Executors
 
 
 @Composable
