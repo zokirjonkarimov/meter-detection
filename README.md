@@ -18,7 +18,7 @@ Meter detection SDK :
 1. `build.gradle` fayliga quyidagilarni qo'shing:
    ```gradle
    dependencies {
-       implementation("com.github.Zokirjon23:meter-detection:1.0.8")
+       implementation("com.github.zokirjonkarimov:meter-detection:1.1.0")
    }
    
 
