@@ -25,7 +25,7 @@ import kotlinx.serialization.json.Json
 import uz.isds.meterai.data.ResultData
 import uz.isds.meterai.data.response.ImageUploadResponse
 import uz.isds.meterai.domain.AiRepository
-
+var apiKey = ""
 class AiRepositoryImpl : AiRepository {
     private val client = HttpClient {
         install(ContentNegotiation) {
@@ -54,9 +54,9 @@ class AiRepositoryImpl : AiRepository {
         }
 
         defaultRequest {
-            url("http://10.1.2.234:27000/")
+            url("https://api.isds.uz/ml/ocr/upload")
             headers {
-                append("x-api-key","TqfrxrvI0rkLed7BF3fmJYr0yWmLHuTVxJAr5tWxuWIJ80hmM2PsFYPspRaAPPDZ")
+                append("x-api-key", apiKey)
             }
         }
     }
@@ -80,7 +80,7 @@ class AiRepositoryImpl : AiRepository {
             if (responseBody.ok == true){
                 emit(ResultData.Success(responseBody))
             }else{
-                emit(ResultData.Message(responseBody.message))
+                emit(ResultData.Message(responseBody.message ?: ""))
             }
         }.catch {
             emit(ResultData.Error(it))

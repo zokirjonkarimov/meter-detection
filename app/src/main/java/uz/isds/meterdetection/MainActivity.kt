@@ -49,13 +49,8 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(startSdk) {
                     if (startSdk) {
                         val intent = Intent(this@MainActivity, MainActivity::class.java)
+                        intent.putExtra("x-api-key", "TqfrxrvI0rkLed7BF3fmJYr0yWmLHuTVxJAr5tWxuWIJ80hmM2PsFYPspRaAPPDZ")
                         activityResultLauncher.launch(intent)
-//                        startActivity(
-//                            Intent(
-//                                this@MainActivity,
-//                                uz.isds.meterai.MainActivity::class.java
-//                            )
-//                        )
                         startSdk = false
                     }
                 }

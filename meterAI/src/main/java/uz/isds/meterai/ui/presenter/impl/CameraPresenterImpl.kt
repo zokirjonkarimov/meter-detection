@@ -4,6 +4,7 @@ import android.util.Log
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.DelicateDecomposeApi
 import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.MutableValue
 import uz.isds.meterai.ui.intent.CameraIntent
@@ -23,6 +24,7 @@ class CameraPresenterImpl(
             is CameraIntent.OnCupture -> {
                 navigator.push(RootComponent.Config.ImageConfirm(intent.bitmap))
             }
+            CameraIntent.OnBack -> navigator.pop()
         }
     }
 }

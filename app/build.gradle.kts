@@ -53,5 +53,4 @@ dependencies {
     implementation(project(":meterAI"))
     androidTestImplementation(platform(libs.androidx.compose.bom))
 //    implementation("com.github.Zokirjon23:meter-detection:1.0.8")
-
 }

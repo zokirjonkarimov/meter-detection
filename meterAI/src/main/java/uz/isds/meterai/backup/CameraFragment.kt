@@ -3,11 +3,10 @@ package uz.isds.meterai.backup
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.Canvas
 import android.graphics.Matrix
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
+import android.graphics.Paint
+import android.graphics.Path
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,33 +29,32 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class CameraFragment : Fragment(), Detector.DetectorListener {
-    private lateinit var binding: CameraLayoutBinding
-    private val isFrontCamera = false
-
+    private var binding: CameraLayoutBinding? = null
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var detector: Detector? = null
-    private var isDetect = false
     private lateinit var cameraExecutor: ExecutorService
+    private var result : Result? = null
+    private var listener : ((Bitmap) -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         binding = CameraLayoutBinding.inflate(layoutInflater)
-        return binding.root
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         cameraExecutor.execute {
-            detector = Detector(requireContext(), MODEL_PATH, this)
+            detector = Detector(requireContext(), MODEL_PATH)
+            detector?.onDetect(this)
         }
-
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -67,11 +65,15 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
     }
 
     private fun bindListeners() {
-        binding.apply {
-            val shapeDrawable = ShapeDrawable(OvalShape())
-            shapeDrawable.paint.color = Color.parseColor("")
+        binding?.apply {
             take.setOnClickListener {
+                result?.let {
+                    listener?.invoke(cropBitmap(it.bitmap,it.boundingBox))
+                }
+            }
 
+            iconButton.setOnClickListener {
+                requireActivity().finish()
             }
         }
     }
@@ -118,15 +120,6 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
 
             val matrix = Matrix().apply {
                 postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
-
-                if (isFrontCamera) {
-                    postScale(
-                        -1f,
-                        1f,
-                        imageProxy.width.toFloat(),
-                        imageProxy.height.toFloat()
-                    )
-                }
             }
 
             val rotatedBitmap = Bitmap.createBitmap(
@@ -141,13 +134,13 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
 
         try {
             camera = cameraProvider.bindToLifecycle(
-                this,
+                requireActivity(),
                 cameraSelector,
                 preview,
                 imageAnalyzer
             )
 
-            preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+            preview?.setSurfaceProvider(binding?.viewFinder?.surfaceProvider)
         } catch(exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
@@ -165,6 +158,8 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
     override fun onDestroy() {
         super.onDestroy()
         detector?.close()
+//        detector = null
+        binding = null
         cameraExecutor.shutdown()
     }
 
@@ -187,25 +182,73 @@ class CameraFragment : Fragment(), Detector.DetectorListener {
 
     override fun onEmptyDetect() {
         requireActivity().runOnUiThread {
-            binding.overlay.clear()
-            val gradientDrawable = GradientDrawable()
-            gradientDrawable.shape = GradientDrawable.OVAL
-            gradientDrawable.setColor(Color.parseColor("#80ED1C24"))
-            binding.take.background = gradientDrawable
-
+            binding?.overlay?.clear()
+            binding?.take?.setImageResource(R.drawable.bt_disable)
+            result = null
         }
     }
-    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
+
+    override fun onDetect(boundingBoxes: List<BoundingBox>, bitmap: Bitmap) {
         requireActivity().runOnUiThread {
-            binding.inferenceTime.text = "${inferenceTime}ms"
-            binding.overlay.apply {
-                setResults(boundingBoxes)
-                invalidate()
+//            binding.inferenceTime.text = "${inferenceTime}ms"
+            binding?.take?.setImageResource(R.drawable.bt_unable)
+            binding?.overlay?.let {
+                val max = boundingBoxes.maxBy { it.cnf }
+                result = Result(max,bitmap)
+                it.setResults(max)
+                it.invalidate()
             }
-            val gradientDrawable = GradientDrawable()
-            gradientDrawable.shape = GradientDrawable.OVAL
-            gradientDrawable.setColor(Color.parseColor("#ED1C24"))
-            binding.take.background = gradientDrawable
         }
+    }
+
+    private fun cropBitmap(bitmap: Bitmap, boundingBox: BoundingBox, cornerRadiusPx: Float = 7.5f): Bitmap {
+        // Normalize qilish va Boxni piksellarda aniqlash
+        val box = android.graphics.Rect(
+            (boundingBox.x1 * bitmap.width).toInt(),
+            (boundingBox.y1 * bitmap.height).toInt(),
+            (boundingBox.x2 * bitmap.width).toInt(),
+            (boundingBox.y2 * bitmap.height).toInt()
+        )
+
+        // Yangi bitmap yaratish
+        val croppedBitmap = Bitmap.createBitmap(
+            box.width(), // Yangi bitmapning kengligi
+            box.height(), // Yangi bitmapning balandligi
+            Bitmap.Config.ARGB_8888 // Shaffoflikni saqlash uchun format
+        )
+
+        // Yangi bitmapga chizish
+        val canvas = Canvas(croppedBitmap)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        // Asl bitmapdan faqat box ichidagi qismini kesib olish
+        canvas.drawBitmap(
+            bitmap,
+            android.graphics.Rect(box.left, box.top, box.right, box.bottom),
+            android.graphics.Rect(0, 0, box.width(), box.height()),
+            paint
+        )
+
+        // Agar burchak radiusi bo‘lsa, uni ishlatish
+        val path = Path().apply {
+            addRoundRect(
+                0f,
+                0f,
+                box.width().toFloat(),
+                box.height().toFloat(),
+                cornerRadiusPx,
+                cornerRadiusPx,
+                Path.Direction.CW
+            )
+        }
+        canvas.clipPath(path)
+
+        return croppedBitmap
+    }
+
+    fun onCuptureClick(listener : (Bitmap) -> Unit){
+        this.listener = listener
     }
 }
+
+data class Result(val boundingBox: BoundingBox,val bitmap: Bitmap)
