@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -49,10 +49,9 @@ android {
 
 dependencies {
     compileOnly(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
+//    implementation(libs.androidx.core.ktx)
 //    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+//    implementation(libs.androidx.constraintlayout)
 
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -81,29 +80,6 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
 }
 
-//publishing {
-//    publications {
-//        register<MavenPublication>("release") {
-//            afterEvaluate {
-//                from(components["release"])
-//                groupId = "uz.isds"
-//                artifactId = "meter"
-//                version = "1.0"
-//            }
-//        }
-//    }
-//}
-
-//repositories {
-//    maven {
-//        name = "GitLab"
-//        url = uri("https://gitlab.isds.uz/api/v4/projects/machine-learning%2Fdevice%2Fsdk%2Fandroid%2Fmeter-detection/packages/maven")
-//        credentials {
-//            username = project.findProperty("gitlabUsername") ?: System.getenv("CI_JOB_TOKEN")
-//            password = project.findProperty("gitlabToken") ?: System.getenv("CI_JOB_TOKEN")
-//        }
-//    }
-//}
 repositories {
     uri("https//:maven.pkg.github.com")
 }

@@ -1,4 +1,4 @@
-package uz.isds.meterai
+package uz.isds.meterai.util
 
 import android.content.Context
 import android.content.pm.PackageManager

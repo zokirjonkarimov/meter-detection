@@ -79,8 +79,8 @@ class AiRepositoryImpl : AiRepository {
             val responseBody = response.body<ImageUploadResponse>()
             if (responseBody.ok == true){
                 emit(ResultData.Success(responseBody))
-            }else{
-                emit(ResultData.Message(responseBody.message ?: ""))
+            }else if (responseBody.message != null) {
+                emit(ResultData.Message(responseBody.message))
             }
         }.catch {
             emit(ResultData.Error(it))

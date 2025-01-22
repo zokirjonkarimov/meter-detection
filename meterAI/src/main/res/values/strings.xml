@@ -1,3 +1,5 @@
 <resources>
     <string name="gpu">GPU</string>
+    <string name="error_connection_server">Проверьте соединение с интернетом и попробуйте пройти проверку снова</string>
+    <string name="success">Успех</string>
 </resources>

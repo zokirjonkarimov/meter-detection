@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import uz.isds.meterai.MainActivity
+import uz.isds.meterai.AIActivity
 import uz.isds.meterai.R
 import uz.isds.meterai.data.response.ImageUploadResponse
 import uz.isds.meterai.other.Base64Image
@@ -43,7 +43,6 @@ import uz.isds.meterai.ui.theme.backgroundColor
 import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.theme.textColor
 import uz.isds.meterai.ui.uistate.ResultUiState
-import kotlin.random.Random
 
 @Composable
 fun ResultScreen(presenter: CommonPresenter<ResultIntent, ResultUiState>) {
@@ -290,7 +289,7 @@ private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit
                                 }
                                 putExtra("result", stringBuild.toString())
                             }
-                            (context as MainActivity).apply {
+                            (context as AIActivity).apply {
                                 setResult(Activity.RESULT_OK, returnIntent)
                                 finish()
                             }

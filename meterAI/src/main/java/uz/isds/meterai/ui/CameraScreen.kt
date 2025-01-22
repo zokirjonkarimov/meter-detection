@@ -52,11 +52,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.launch
-import uz.isds.meterai.MainActivity
+import uz.isds.meterai.AIActivity
 import uz.isds.meterai.R
-import uz.isds.meterai.backup.BoundingBox
-import uz.isds.meterai.backup.Detector
-import uz.isds.meterai.isFlashSupported
+import uz.isds.meterai.other.BoundingBox
+import uz.isds.meterai.other.Detector
+import uz.isds.meterai.util.isFlashSupported
 import uz.isds.meterai.other.Constants.MODEL_PATH
 import uz.isds.meterai.other.Result
 import uz.isds.meterai.ui.intent.CameraIntent
@@ -215,7 +215,7 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
             BoundingBoxView(it.boundingBox)
         }
         IconButton(
-            onClick = { (context as MainActivity).finish() },
+            onClick = { (context as AIActivity).finish() },
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
         ) {
             Icon(

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import uz.isds.meterai.R
+import uz.isds.meterai.other.BoundingBox
 
 //@Composable
 //fun BoundingBoxView(boundingBox: BoundingBox,bitmap: Bitmap) {
@@ -87,7 +88,7 @@ import uz.isds.meterai.R
 
 @Composable
 fun BoundingBoxView(
-    boundingBox: uz.isds.meterai.backup.BoundingBox,
+    boundingBox: BoundingBox,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
