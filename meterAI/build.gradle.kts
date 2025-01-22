@@ -42,7 +42,7 @@ android {
         }
     }
     buildFeatures {
-        viewBinding = true
+//        viewBinding = true
         compose = true
     }
 }
@@ -85,12 +85,14 @@ repositories {
 }
 
 afterEvaluate {
-    android.libraryVariants.onEach { variant ->
-        publishing.publications.create(variant.name, MavenPublication::class.java) {
-            from(components.findByName(variant.name))
-            groupId = "uz.isds"
-            artifactId = "meter-detection"
-            version = "1.0.0"
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "uz.isds"
+                artifactId = "meter-detection"
+                version = "1.0.0"
+            }
         }
     }
 }

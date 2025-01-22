@@ -11,7 +11,42 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-if @kotlinx.serialization.Serializable class ** {
+    public static ** INSTANCE;
+}
+-keepclassmembers class <1> {
+    public static <1> INSTANCE;
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+#-keep class com.auth0.** { *; }
+#-keep class io.jsonwebtoken.** { *; }
+#-keep class com.example.jwt.** { *; }
+#-keep class io.jsonwebtoken.** { *; }
 
+# Keep the generated serialization metadata for Kotlinx Serialization
+-keepnames class kotlinx.serialization.** { *; }
+-keepnames class kotlin.Metadata { *; }
+
+# Keep all @Serializable classes and their companion objects
+-keep class * extends kotlinx.serialization.KSerializer { *; }
+-keepclassmembers class ** {
+    kotlinx.serialization.KSerializer SERIALIZER();
+}
+
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault
+-keep @com.fasterxml.jackson.annotation.* class *
+-keep class com.fasterxml.jackson.** { *; }
+
+#-keep class uz.veolia.cabinet.data.remote** { *; }
+#-keep class uz.veolia.cabinet.data.model** { *; }
+# Prevent Jackson from using Java7 features that require java.beans
+-dontwarn com.fasterxml.jackson.databind.ext.Java7SupportImpl
+-dontwarn java.beans.**
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable
