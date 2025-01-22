@@ -31,29 +31,30 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 -dontwarn org.slf4j.impl.StaticLoggerBinder
-#-keep class com.auth0.** { *; }
-#-keep class io.jsonwebtoken.** { *; }
-#-keep class com.example.jwt.** { *; }
-#-keep class io.jsonwebtoken.** { *; }
-
+##-keep class com.auth0.** { *; }
+##-keep class io.jsonwebtoken.** { *; }
+##-keep class com.example.jwt.** { *; }
+##-keep class io.jsonwebtoken.** { *; }
+#
 # Keep the generated serialization metadata for Kotlinx Serialization
 -keepnames class kotlinx.serialization.** { *; }
 -keepnames class kotlin.Metadata { *; }
-
+#
 # Keep all @Serializable classes and their companion objects
 -keep class * extends kotlinx.serialization.KSerializer { *; }
 -keepclassmembers class ** {
     kotlinx.serialization.KSerializer SERIALIZER();
 }
-
+#
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault
--keep @com.fasterxml.jackson.annotation.* class *
--keep class com.fasterxml.jackson.** { *; }
--keep class com.auth0.jwt.** { *; }
-#-keepclassmembers class uz.veolia.cabinet.data.remote.response.TokenPayload {*;}
-
-#-keep class uz.veolia.cabinet.data.remote** { *; }
-#-keep class uz.veolia.cabinet.data.model** { *; }
+#-keep @com.fasterxml.jackson.annotation.* class *
+#-keep class com.fasterxml.jackson.** { *; }
+#-keep class com.auth0.jwt.** { *; }
+##-keepclassmembers class uz.veolia.cabinet.data.remote.response.TokenPayload {*;}
+#
+##-keep class uz.veolia.cabinet.data.remote** { *; }
+##-keep class uz.veolia.cabinet.data.model** { *; }
 # Prevent Jackson from using Java7 features that require java.beans
 -dontwarn com.fasterxml.jackson.databind.ext.Java7SupportImpl
 -dontwarn java.beans.**
+

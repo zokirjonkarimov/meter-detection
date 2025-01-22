@@ -54,3 +54,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepnames class kotlinx.serialization.** { *; }
+-keepnames class kotlin.Metadata { *; }
+
+# Keep all @Serializable classes and their companion objects
+-keep class * extends kotlinx.serialization.KSerializer { *; }
+-keepclassmembers class ** {
+    kotlinx.serialization.KSerializer SERIALIZER();
+}
