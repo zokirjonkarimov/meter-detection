@@ -12,7 +12,7 @@ android {
         applicationId = "uz.isds.meterdetection"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -51,7 +51,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     compileOnly(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-//    implementation(project(":meterAI"))
+    implementation(project(":meterAI"))
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    implementation("com.github.zokirjonkarimov:meter-detection:1.1.2")
+//    implementation("com.github.zokirjonkarimov:meter-detection:1.1.3")
 }

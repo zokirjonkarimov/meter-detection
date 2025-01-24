@@ -123,40 +123,39 @@ private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if ((uiState.data.data?.result?.size ?: 0) > 4) {
-                    repeat(5) {
-                        val result = uiState.data.data?.result?.get(it)
-                        val percentage = uiState.data.data?.percent?.get(it) ?: 0.0
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 2.dp)
-                                .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
-                                .border(
-                                    1.dp, when {
-                                        percentage > 0.98 -> Color(0xFF3CB95D)
-                                        percentage > 0.96 -> Color(0xFFFFC400)
-                                        percentage > 0.0 -> Color(0xFFED1C24)
-                                        else -> Color.Transparent
-                                    }, RoundedCornerShape(7.25.dp)
-                                )
-                                .background(
-                                    backgroundColor,
-                                    RoundedCornerShape(7.25.dp)
-                                ), contentAlignment = Alignment.Center
-                        ) {
-                            TextApp(result ?: "", fontWeight = FontWeight(700), fontSize = 13.sp)
-                        }
+                repeat(5) {
+                    val result = uiState.data.data?.result?.getOrNull(it)
+                    val percentage = uiState.data.data?.percent?.getOrNull(it) ?: 0.0
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 2.dp)
+                            .defaultMinSize(minWidth = 26.dp, minHeight = 36.dp)
+                            .border(
+                                1.dp, when {
+                                    percentage > 0.98 -> Color(0xFF3CB95D)
+                                    percentage > 0.96 -> Color(0xFFFFC400)
+                                    percentage > 0.0 -> Color(0xFFED1C24)
+                                    else -> Color.Transparent
+                                }, RoundedCornerShape(7.25.dp)
+                            )
+                            .background(
+                                backgroundColor,
+                                RoundedCornerShape(7.25.dp)
+                            ), contentAlignment = Alignment.Center
+                    ) {
+                        TextApp(result ?: "", fontWeight = FontWeight(700), fontSize = 13.sp)
                     }
                 }
-                if ((uiState.data.data?.result?.size ?: 0) >= 8) {
+
+                if ((uiState.data.data?.result?.size ?: 0) > 5) {
                     TextApp(
                         ",", modifier = Modifier
                             .align(Alignment.Bottom)
                             .padding(end = 2.dp)
                     )
                     repeat(3) {
-                        val result = uiState.data.data?.result?.get(it + 5)
-                        val percentage = uiState.data.data?.percent?.get(it + 5) ?: 0.0
+                        val result = uiState.data.data?.result?.getOrNull(it + 5)
+                        val percentage = uiState.data.data?.percent?.getOrNull(it + 5) ?: 0.0
                         Box(
                             modifier = Modifier
                                 .padding(end = 2.dp)
@@ -178,7 +177,7 @@ private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit
                                 result ?: "",
                                 fontWeight = FontWeight(700),
                                 fontSize = 13.sp,
-                                color = primaryColor
+                                color = Color(0xFFED1C24)
                             )
                         }
                     }
@@ -260,7 +259,8 @@ private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit
                         .size(60.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFE4E3E5))
-                        .clickable { intent(ResultIntent.OpenCamera) }, contentAlignment = Alignment.Center
+                        .clickable { intent(ResultIntent.OpenCamera) },
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_refresh),
@@ -284,9 +284,11 @@ private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit
                         .clickable {
                             val returnIntent = Intent().apply {
                                 val stringBuild = StringBuilder()
-                                uiState.data.data?.result?.filterNotNull()?.forEach {
-                                    stringBuild.append(it)
-                                }
+                                uiState.data.data?.result
+                                    ?.filterNotNull()
+                                    ?.forEach {
+                                        stringBuild.append(it)
+                                    }
                                 putExtra("result", stringBuild.toString())
                             }
                             (context as AIActivity).apply {
