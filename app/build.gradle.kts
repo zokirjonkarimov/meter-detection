@@ -14,14 +14,13 @@ android {
         targetSdk = 35
         versionCode = 3
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -51,7 +50,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     compileOnly(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(project(":meterAI"))
+//    implementation(project(":meterAI"))
     androidTestImplementation(platform(libs.androidx.compose.bom))
 //    implementation("com.github.zokirjonkarimov:meter-detection:1.1.3")
+    implementation("com.github.zokirjonkarimov:meter-detection:1.1.9")
 }
+

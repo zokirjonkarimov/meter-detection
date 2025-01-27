@@ -22,4 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Meter detection"
 include(":app")
-include(":meterAI")
+//include(":meterAI")
