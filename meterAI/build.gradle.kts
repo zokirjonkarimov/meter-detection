@@ -80,18 +80,15 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
 }
 
-repositories {
-    uri("https//:maven.pkg.github.com")
-}
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            afterEvaluate {
                 from(components["release"])
-                groupId = "uz.isds"
-                artifactId = "meter-detection"
-                version = "1.0.0"
+//                groupId = "uz.isds"
+//                artifactId = "meter-detection"
+//                version = "1.0.0"
             }
         }
     }
