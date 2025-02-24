@@ -29,7 +29,7 @@ import uz.isds.meterai.util.isConnection
 class SendImagePresenterImpl(
     componentContext: ComponentContext,
     private val navigator: StackNavigation<RootComponent.Config>,
-    private val byteArray: ByteArray?
+    byteArray: ByteArray?
 ) : CommonPresenter<SendImageIntent, SendImageUiState>, ComponentContext by componentContext {
     override val uiState = MutableValue(SendImageUiState())
     private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())

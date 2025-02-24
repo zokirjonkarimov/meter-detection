@@ -6,27 +6,30 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import uz.isds.meterai.ui.intent.CameraIntent
+import uz.isds.meterai.ui.intent.FileUploadIntent
 import uz.isds.meterai.ui.intent.ImageConfirmIntent
 import uz.isds.meterai.ui.intent.ResultIntent
 import uz.isds.meterai.ui.intent.SendImageIntent
 import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.presenter.impl.CameraPresenterImpl
+import uz.isds.meterai.ui.presenter.impl.FileUploadPresenterImpl
 import uz.isds.meterai.ui.presenter.impl.ImageConfirmPresenterImpl
 import uz.isds.meterai.ui.presenter.impl.ResultPresenterImpl
 import uz.isds.meterai.ui.presenter.impl.SendImagePresenterImpl
 import uz.isds.meterai.ui.uistate.CameraUiState
+import uz.isds.meterai.ui.uistate.FileUploadUiState
 import uz.isds.meterai.ui.uistate.ImageConfirmUiState
 import uz.isds.meterai.ui.uistate.ResultUiState
 import uz.isds.meterai.ui.uistate.SendImageUiState
 
-class RootComponentImpl(componentContext: ComponentContext) : RootComponent,
+class RootComponentImpl(componentContext: ComponentContext,private val fromFile: Boolean) : RootComponent,
     ComponentContext by componentContext {
     private val navigator = StackNavigation<RootComponent.Config>()
     override val stack: Value<ChildStack<*, RootComponent.Child>> =
         childStack(
             source = navigator,
             serializer = RootComponent.Config.serializer(),
-            initialConfiguration = RootComponent.Config.Camera,
+            initialConfiguration = if (fromFile) RootComponent.Config.FileUpload else RootComponent.Config.Camera,
             handleBackButton = true,
             childFactory = ::child,
         )
@@ -56,6 +59,12 @@ class RootComponentImpl(componentContext: ComponentContext) : RootComponent,
                 val presenter: CommonPresenter<SendImageIntent, SendImageUiState> =
                     SendImagePresenterImpl(componentContext, navigator,config.byteArray)
                 RootComponent.Child.SendImage(presenter)
+            }
+
+            RootComponent.Config.FileUpload -> {
+                val presenter: CommonPresenter<FileUploadIntent, FileUploadUiState> =
+                    FileUploadPresenterImpl(componentContext, navigator)
+                RootComponent.Child.FileUpload(presenter)
             }
         }
     }

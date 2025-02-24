@@ -12,7 +12,7 @@ android {
         applicationId = "uz.isds.meterdetection"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
+        versionCode = 5
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,8 +26,8 @@ android {
                 "proguard-rules.pro"
             )
         }
-
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

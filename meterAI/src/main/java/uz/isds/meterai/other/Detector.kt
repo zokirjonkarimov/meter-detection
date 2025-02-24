@@ -2,6 +2,9 @@ package uz.isds.meterai.other
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
@@ -217,4 +220,49 @@ class Detector(
         private const val CONFIDENCE_THRESHOLD = 0.86F
         private const val IOU_THRESHOLD = 0.7F
     }
+}
+
+fun cropBitmap(bitmap: Bitmap, boundingBox: BoundingBox, cornerRadiusPx: Float = 7.5f): Bitmap {
+    // Normalize qilish va Boxni piksellarda aniqlash
+    val box = android.graphics.Rect(
+        (boundingBox.x1 * bitmap.width).toInt(),
+        (boundingBox.y1 * bitmap.height).toInt(),
+        (boundingBox.x2 * bitmap.width).toInt(),
+        (boundingBox.y2 * bitmap.height).toInt()
+    )
+
+    // Yangi bitmap yaratish
+    val croppedBitmap = Bitmap.createBitmap(
+        box.width(), // Yangi bitmapning kengligi
+        box.height(), // Yangi bitmapning balandligi
+        Bitmap.Config.ARGB_8888 // Shaffoflikni saqlash uchun format
+    )
+
+    // Yangi bitmapga chizish
+    val canvas = Canvas(croppedBitmap)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    // Asl bitmapdan faqat box ichidagi qismini kesib olish
+    canvas.drawBitmap(
+        bitmap,
+        android.graphics.Rect(box.left, box.top, box.right, box.bottom),
+        android.graphics.Rect(0, 0, box.width(), box.height()),
+        paint
+    )
+
+    // Agar burchak radiusi bo‘lsa, uni ishlatish
+    val path = Path().apply {
+        addRoundRect(
+            0f,
+            0f,
+            box.width().toFloat(),
+            box.height().toFloat(),
+            cornerRadiusPx,
+            cornerRadiusPx,
+            Path.Direction.CW
+        )
+    }
+    canvas.clipPath(path)
+
+    return croppedBitmap
 }

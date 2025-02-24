@@ -7,11 +7,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import uz.isds.meterai.data.response.ImageUploadResponse
 import uz.isds.meterai.ui.intent.CameraIntent
+import uz.isds.meterai.ui.intent.FileUploadIntent
 import uz.isds.meterai.ui.intent.ImageConfirmIntent
 import uz.isds.meterai.ui.intent.ResultIntent
 import uz.isds.meterai.ui.intent.SendImageIntent
 import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.uistate.CameraUiState
+import uz.isds.meterai.ui.uistate.FileUploadUiState
 import uz.isds.meterai.ui.uistate.ImageConfirmUiState
 import uz.isds.meterai.ui.uistate.ResultUiState
 import uz.isds.meterai.ui.uistate.SendImageUiState
@@ -25,10 +27,14 @@ interface RootComponent {
 
         class SendImage(val presenter: CommonPresenter<SendImageIntent, SendImageUiState>) : Child
         class Result(val presenter: CommonPresenter<ResultIntent, ResultUiState>) : Child
+        class FileUpload(val presenter: CommonPresenter<FileUploadIntent, FileUploadUiState>) : Child
     }
 
     @Serializable
     sealed interface Config {
+        @Serializable
+        data object FileUpload : Config
+
         @Serializable
         data object Camera : Config
 

@@ -11,6 +11,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import uz.isds.meterai.domain.impl.apiKey
 import uz.isds.meterai.ui.CameraScreen
+import uz.isds.meterai.ui.FileChooseScreen
 import uz.isds.meterai.ui.ImageConfirmScreen
 import uz.isds.meterai.ui.ResultScreen
 import uz.isds.meterai.ui.SendImageScreen
@@ -20,8 +21,9 @@ import uz.isds.meterai.ui.navigation.RootComponentImpl
 class AIActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val rootComponent : RootComponent = RootComponentImpl(defaultComponentContext())
+        val fromFile = intent.getBooleanExtra("fromFile",false)
         apiKey = intent.getStringExtra("x-api-key") ?: ""
+        val rootComponent : RootComponent = RootComponentImpl(defaultComponentContext(),fromFile)
         setContent {
             Children(
                 stack = rootComponent.stack,
@@ -33,8 +35,10 @@ class AIActivity : ComponentActivity(){
                     is RootComponent.Child.ImageConfirm -> ImageConfirmScreen(instance.presenter)
                     is RootComponent.Child.Result -> ResultScreen(instance.presenter)
                     is RootComponent.Child.SendImage -> SendImageScreen(instance.presenter)
+                    is RootComponent.Child.FileUpload -> FileChooseScreen(instance.presenter)
                 }
             }
         }
     }
 }
+
