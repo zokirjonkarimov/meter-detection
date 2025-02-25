@@ -41,7 +41,9 @@ import uz.isds.meterai.ui.intent.ResultIntent
 import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.theme.backgroundColor
 import uz.isds.meterai.ui.theme.primaryColor
+import uz.isds.meterai.ui.theme.success_background_color
 import uz.isds.meterai.ui.theme.textColor
+import uz.isds.meterai.ui.theme.whiteColor
 import uz.isds.meterai.ui.uistate.ResultUiState
 
 @Composable
@@ -191,60 +193,92 @@ private fun ResultContent(uiState: ResultUiState, intent: (ResultIntent) -> Unit
             TextApp(
                 fontSize = 12.sp,
                 text = "Точность распозования:",
-                modifier = Modifier.padding(start = 16.dp, bottom = 10.dp, top = 40.dp),
-                color = Color(0xFF7F7A84)
+                modifier = Modifier.padding(start = 16.dp, bottom = 10.dp, top = 40.dp)
+//                Color(0xFF7F7A84) Color(0xFFFFC400) Color(0xFFED1C24)
             )
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(0.33f)
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                TextApp(
+                    text = when {
+                        uiState.percentage > 98 -> "Высокая"
+                        uiState.percentage > 96 -> "Средня"
+                        uiState.percentage > 0 -> "Низкая"
+                        else -> ""
+                    }, fontSize = 12.sp
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .size(36.dp, 20.dp)
+                        .background(
+                            color = when {
+                                uiState.percentage > 98 -> Color(0xFF3CB95D)
+                                uiState.percentage > 96 -> Color(0xFFFFC400)
+                                uiState.percentage > 0 -> Color(0xFFED1C24)
+                                else -> Color.Transparent
+                            },
+                            RoundedCornerShape(3.dp)
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .size(6.dp)
-                            .background(Color(0xFF3CB95D), CircleShape)
-                    )
                     TextApp(
+                        "${uiState.percentage}%",
                         fontSize = 12.sp,
-                        text = "Высокий",
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(0.33f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .size(6.dp)
-                            .background(Color(0xFFFFC400), CircleShape)
-                    )
-                    TextApp(
-                        fontSize = 12.sp,
-                        text = "Средний",
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(0.33f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .size(6.dp)
-                            .background(Color(0xFFED1C24), CircleShape)
-                    )
-                    TextApp(
-                        fontSize = 12.sp,
-                        text = "Низкий",
+                        lineHeight = 12.sp,
+                        color = whiteColor
                     )
                 }
             }
+//            Row(
+//                modifier = Modifier
+//                    .padding(horizontal = 16.dp)
+//                    .fillMaxWidth()
+//            ) {
+//                Row(
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    modifier = Modifier.weight(0.33f)
+//                ) {
+//                    Box(
+//                        modifier = Modifier
+//                            .padding(end = 10.dp)
+//                            .size(6.dp)
+//                            .background(Color(0xFF3CB95D), CircleShape)
+//                    )
+//                    TextApp(
+//                        fontSize = 12.sp,
+//                        text = "Высокий",
+//                    )
+//                }
+//                Row(
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    modifier = Modifier.weight(0.33f)
+//                ) {
+//                    Box(
+//                        modifier = Modifier
+//                            .padding(end = 10.dp)
+//                            .size(6.dp)
+//                            .background(Color(0xFFFFC400), CircleShape)
+//                    )
+//                    TextApp(
+//                        fontSize = 12.sp,
+//                        text = "Средний",
+//                    )
+//                }
+//                Row(
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    modifier = Modifier.weight(0.33f)
+//                ) {
+//                    Box(
+//                        modifier = Modifier
+//                            .padding(end = 10.dp)
+//                            .size(6.dp)
+//                            .background(Color(0xFFED1C24), CircleShape)
+//                    )
+//                    TextApp(
+//                        fontSize = 12.sp,
+//                        text = "Низкий",
+//                    )
+//                }
+//            }
         }
         Row(
             modifier = Modifier

@@ -14,11 +14,15 @@ class ResultPresenterImpl(
     componentContext: ComponentContext,
     private val navigator: StackNavigation<RootComponent.Config>,
     data: ImageUploadResponse
-) : CommonPresenter<ResultIntent, ResultUiState>, ComponentContext by componentContext{
-    override val uiState = MutableValue(ResultUiState(data = data))
+) : CommonPresenter<ResultIntent, ResultUiState>, ComponentContext by componentContext {
+    override val uiState = MutableValue(ResultUiState(data = data, percentage =
+    data.data?.percent?.let {
+        (data.data.percent.filterNotNull().let { it.sumOf { it * 100 } / it.size }.toInt())
+    } ?: 0
+    ))
 
     override fun onEventDispatcher(intent: ResultIntent) {
-        when(intent){
+        when (intent) {
             ResultIntent.OpenCamera -> navigator.replaceAll(RootComponent.Config.Camera)
         }
     }
