@@ -126,12 +126,12 @@ class Detector(
             return
         }
 
-        detectorListener?.onDetect(bestBoxes,frame)
+        detectorListener?.onDetect(bestBoxes, frame)
     }
 
     private fun bestBox(array: FloatArray): List<BoundingBox>? {
 
-        val boundingBoxes = mutableListOf<BoundingBox>()
+//        val boundingBoxes = mutableListOf<BoundingBox>()
 
         for (c in 0 until numElements) {
             var maxConf = CONFIDENCE_THRESHOLD
@@ -160,18 +160,23 @@ class Detector(
                 if (y1 < 0F || y1 > 1F) continue
                 if (x2 < 0F || x2 > 1F) continue
                 if (y2 < 0F || y2 > 1F) continue
-                boundingBoxes.add(
-                    BoundingBox(
-                        x1 = x1, y1 = y1, x2 = x2, y2 = y2,
-                        cx = cx, cy = cy, w = w, h = h,
-                        cnf = maxConf, cls = maxIdx, clsName = maxConf.toString()
+//                boundingBoxes.add(
+                return applyNMS(
+                    listOf(
+                        BoundingBox(
+                            x1 = x1, y1 = y1, x2 = x2, y2 = y2,
+                            cx = cx, cy = cy, w = w, h = h,
+                            cnf = maxConf, cls = maxIdx, clsName = maxConf.toString()
+                        )
                     )
                 )
+//                )
             }
         }
-        if (boundingBoxes.isEmpty()) return null
-
-        return applyNMS(boundingBoxes)
+        return null
+//        if (boundingBoxes.isEmpty()) return null
+//
+//        return applyNMS(boundingBoxes)
     }
 
     private fun applyNMS(boxes: List<BoundingBox>): MutableList<BoundingBox> {
