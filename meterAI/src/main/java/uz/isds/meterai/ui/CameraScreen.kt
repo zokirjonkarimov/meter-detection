@@ -64,6 +64,7 @@ import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.uistate.CameraUiState
 import java.util.concurrent.Executors
+import androidx.core.graphics.createBitmap
 
 
 @Composable
@@ -168,11 +169,7 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
                     .setTargetRotation(rotation)
                     .build().apply {
                         setAnalyzer(cameraExecutor) { imageProxy ->
-                            val bitmapBuffer = Bitmap.createBitmap(
-                                imageProxy.width,
-                                imageProxy.height,
-                                Bitmap.Config.ARGB_8888
-                            )
+                            val bitmapBuffer = createBitmap(imageProxy.width, imageProxy.height)
                             imageProxy.use { bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer) }
 
                             val matrix = Matrix().apply {
@@ -312,11 +309,7 @@ fun cropBitmap(bitmap: Bitmap, boundingBox: BoundingBox, cornerRadiusPx: Float =
     )
 
     // Yangi bitmap yaratish
-    val croppedBitmap = Bitmap.createBitmap(
-        box.width(), // Yangi bitmapning kengligi
-        box.height(), // Yangi bitmapning balandligi
-        Bitmap.Config.ARGB_8888 // Shaffoflikni saqlash uchun format
-    )
+    val croppedBitmap = createBitmap(box.width(), box.height())
 
     // Yangi bitmapga chizish
     val canvas = Canvas(croppedBitmap)
