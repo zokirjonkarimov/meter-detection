@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.stack.Children
@@ -28,7 +29,7 @@ class AIActivity : ComponentActivity(){
             Children(
                 stack = rootComponent.stack,
                 animation = stackAnimation(fade()),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().systemBarsPadding()
             ) {
                 when(val instance = it.instance){
                     is RootComponent.Child.Camera -> CameraScreen(instance.presenter)

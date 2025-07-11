@@ -55,7 +55,6 @@ import kotlinx.coroutines.launch
 import uz.isds.meterai.AIActivity
 import uz.isds.meterai.R
 import uz.isds.meterai.other.BoundingBox
-import uz.isds.meterai.other.Detector
 import uz.isds.meterai.util.isFlashSupported
 import uz.isds.meterai.other.Constants.MODEL_PATH
 import uz.isds.meterai.other.Result
@@ -65,6 +64,7 @@ import uz.isds.meterai.ui.theme.primaryColor
 import uz.isds.meterai.ui.uistate.CameraUiState
 import java.util.concurrent.Executors
 import androidx.core.graphics.createBitmap
+import uz.isds.meterai.other.Detector
 
 
 @Composable
@@ -119,7 +119,7 @@ private fun CameraContent(intent: (CameraIntent) -> Unit) {
     }
     LaunchedEffect(Unit) {
         cameraExecutor.execute {
-            detector = Detector(context, MODEL_PATH)
+            detector = Detector(context, uri!!)
             detector?.onDetect(listener)
         }
     }

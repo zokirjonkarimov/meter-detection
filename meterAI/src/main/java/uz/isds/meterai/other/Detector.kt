@@ -5,6 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
+import android.net.Uri
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
@@ -15,10 +19,10 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import uz.isds.meterai.ui.copyModelFile
 
 class Detector(
-    private val context: Context,
-    private val modelPath: String,
+    private val context: Context, uri: Uri,
 ) {
     private var detectorListener: DetectorListener? = null
     private var interpreter: Interpreter
@@ -31,6 +35,7 @@ class Detector(
     fun onDetect(listener: DetectorListener) {
         detectorListener = listener
     }
+
 
     private val imageProcessor = ImageProcessor.Builder()
         .add(NormalizeOp(INPUT_MEAN, INPUT_STANDARD_DEVIATION))
@@ -49,8 +54,9 @@ class Detector(
             }
         }
 
-        val model = FileUtil.loadMappedFile(context, modelPath)
-        interpreter = Interpreter(model, options)
+//        val model = FileUtil.loadMappedFile(context, modelPath)
+        val file = copyModelFile(context, uri)
+        interpreter = Interpreter(file, options)
 
         val inputShape = interpreter.getInputTensor(0)?.shape()
         val outputShape = interpreter.getOutputTensor(0)?.shape()
@@ -72,28 +78,28 @@ class Detector(
         }
     }
 
-    fun restart(isGpu: Boolean) {
-        interpreter.close()
-
-        val options = if (isGpu) {
-            val compatList = CompatibilityList()
-            Interpreter.Options().apply {
-                if (compatList.isDelegateSupportedOnThisDevice) {
-                    val delegateOptions = compatList.bestOptionsForThisDevice
-                    this.addDelegate(GpuDelegate(delegateOptions))
-                } else {
-                    this.setNumThreads(4)
-                }
-            }
-        } else {
-            Interpreter.Options().apply {
-                this.setNumThreads(4)
-            }
-        }
-
-        val model = FileUtil.loadMappedFile(context, modelPath)
-        interpreter = Interpreter(model, options)
-    }
+//    fun restart(isGpu: Boolean) {
+//        interpreter.close()
+//
+//        val options = if (isGpu) {
+//            val compatList = CompatibilityList()
+//            Interpreter.Options().apply {
+//                if (compatList.isDelegateSupportedOnThisDevice) {
+//                    val delegateOptions = compatList.bestOptionsForThisDevice
+//                    this.addDelegate(GpuDelegate(delegateOptions))
+//                } else {
+//                    this.setNumThreads(4)
+//                }
+//            }
+//        } else {
+//            Interpreter.Options().apply {
+//                this.setNumThreads(4)
+//            }
+//        }
+//
+////        val model = FileUtil.loadMappedFile(context, modelPath)
+//        interpreter = Interpreter(copyModelFile(), options)
+//    }
 
     fun close() {
         interpreter.close()
@@ -107,7 +113,7 @@ class Detector(
 
 //        var inferenceTime = SystemClock.uptimeMillis()
 
-        val resizedBitmap = Bitmap.createScaledBitmap(frame, tensorWidth, tensorHeight, false)
+        val resizedBitmap = frame.scale(tensorWidth, tensorHeight, false)
 
         val tensorImage = TensorImage(INPUT_IMAGE_TYPE)
         tensorImage.load(resizedBitmap)
@@ -142,6 +148,9 @@ class Detector(
                 if (array[arrayIdx] > maxConf) {
                     maxConf = array[arrayIdx]
                     maxIdx = j - 4
+                    if (maxIdx == 1){
+                        return null
+                    }
                 }
                 j++
                 arrayIdx += numElements
@@ -222,14 +231,14 @@ class Detector(
         private const val INPUT_STANDARD_DEVIATION = 255f
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
-        private const val CONFIDENCE_THRESHOLD = 0.86F
+        private const val CONFIDENCE_THRESHOLD = 0.80F
         private const val IOU_THRESHOLD = 0.7F
     }
 }
 
 fun cropBitmap(bitmap: Bitmap, boundingBox: BoundingBox, cornerRadiusPx: Float = 7.5f): Bitmap {
     // Normalize qilish va Boxni piksellarda aniqlash
-    val box = android.graphics.Rect(
+    val box = Rect(
         (boundingBox.x1 * bitmap.width).toInt(),
         (boundingBox.y1 * bitmap.height).toInt(),
         (boundingBox.x2 * bitmap.width).toInt(),
@@ -237,11 +246,7 @@ fun cropBitmap(bitmap: Bitmap, boundingBox: BoundingBox, cornerRadiusPx: Float =
     )
 
     // Yangi bitmap yaratish
-    val croppedBitmap = Bitmap.createBitmap(
-        box.width(), // Yangi bitmapning kengligi
-        box.height(), // Yangi bitmapning balandligi
-        Bitmap.Config.ARGB_8888 // Shaffoflikni saqlash uchun format
-    )
+    val croppedBitmap = createBitmap(box.width(), box.height())
 
     // Yangi bitmapga chizish
     val canvas = Canvas(croppedBitmap)
@@ -250,8 +255,8 @@ fun cropBitmap(bitmap: Bitmap, boundingBox: BoundingBox, cornerRadiusPx: Float =
     // Asl bitmapdan faqat box ichidagi qismini kesib olish
     canvas.drawBitmap(
         bitmap,
-        android.graphics.Rect(box.left, box.top, box.right, box.bottom),
-        android.graphics.Rect(0, 0, box.width(), box.height()),
+        Rect(box.left, box.top, box.right, box.bottom),
+        Rect(0, 0, box.width(), box.height()),
         paint
     )
 

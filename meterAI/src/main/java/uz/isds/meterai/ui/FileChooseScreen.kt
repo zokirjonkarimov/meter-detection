@@ -4,13 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,9 +24,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,8 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import uz.isds.meterai.data.LocalStorage
 import uz.isds.meterai.other.Constants.MODEL_PATH
-import uz.isds.meterai.other.Detector
 import uz.isds.meterai.ui.component.TextApp
 import uz.isds.meterai.ui.component.ToastError
 import uz.isds.meterai.ui.intent.FileUploadIntent
@@ -45,7 +43,12 @@ import uz.isds.meterai.ui.presenter.CommonPresenter
 import uz.isds.meterai.ui.theme.backgroundColor
 import uz.isds.meterai.ui.theme.whiteColor
 import uz.isds.meterai.ui.uistate.FileUploadUiState
+import uz.isds.meterai.other.Detector
+import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStream
+
+var uri: Uri? = null
 
 @Composable
 fun FileChooseScreen(presenter: CommonPresenter<FileUploadIntent, FileUploadUiState>) {
@@ -56,6 +59,7 @@ fun FileChooseScreen(presenter: CommonPresenter<FileUploadIntent, FileUploadUiSt
 @Composable
 fun FileChooseContent(uiState: FileUploadUiState, intent: (FileUploadIntent) -> Unit) {
     val scaffoldState = rememberBottomSheetScaffoldState()
+
     BottomSheetScaffold(
         sheetSwipeEnabled = false,
         modifier = Modifier
@@ -67,12 +71,12 @@ fun FileChooseContent(uiState: FileUploadUiState, intent: (FileUploadIntent) -> 
             val context = LocalContext.current
             val galleryLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()
-            ) { uri ->
-                uri?.let {
+            ) { it ->
+                it?.let {
                     intent(
                         FileUploadIntent.DetectBitmap(
-                            Detector(context, MODEL_PATH),
-                            uriToBitmap(context, uri)
+                            Detector(context, uri!!),
+                            uriToBitmap(context, it)
                         )
                     )
                 }
@@ -92,6 +96,7 @@ fun FileChooseContent(uiState: FileUploadUiState, intent: (FileUploadIntent) -> 
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = { intent(FileUploadIntent.OpenCamera) },
+                    enabled = uri != null
                 ) {
                     Text("Камера")
                 }
@@ -100,7 +105,8 @@ fun FileChooseContent(uiState: FileUploadUiState, intent: (FileUploadIntent) -> 
                     modifier = Modifier.weight(1f),
                     onClick = {
                         galleryLauncher.launch("image/*")
-                    }
+                    },
+                    enabled = uri != null
                 ) {
                     Text("Галерея")
                 }
@@ -154,4 +160,13 @@ private fun uriToBitmap(context: Context, uri: Uri?): Bitmap? {
         e.printStackTrace()
         null
     }
+}
+
+fun copyModelFile(context: Context, uri: Uri): File {
+    val inputStream = context.contentResolver.openInputStream(uri)!!
+    val tempFile = File.createTempFile("model_temp", ".tflite", context.cacheDir)
+    FileOutputStream(tempFile).use { outputStream ->
+        inputStream.copyTo(outputStream)
+    }
+    return tempFile
 }
